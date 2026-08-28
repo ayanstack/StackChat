@@ -1,0 +1,246 @@
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-06 15:26:58"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-06 15:26:58"}
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-06 15:26:59"}
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-06 15:27:05"}
+{"level":"error","message":"POST /api/v1/auth/register -> 404: Route not found: /api/v1/auth/register","timestamp":"2026-08-07 01:32:01"}
+{"level":"error","message":"POST /api/v1/auth/register -> 404: Route not found: /api/v1/auth/register","timestamp":"2026-08-07 01:32:30"}
+{"level":"error","message":"POST /api/v1/auth/register -> 404: Route not found: /api/v1/auth/register","timestamp":"2026-08-07 01:41:50"}
+{"level":"error","message":"POST /api/v1/auth/register -> 404: Route not found: /api/v1/auth/register","timestamp":"2026-08-07 01:42:06"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Expected property name or '}' in JSON at position 96 (line 5 column 15)","timestamp":"2026-08-07 01:57:01"}
+{"level":"error","message":"POST /api/v1/auth/register -> 409: An account with this email already exists","timestamp":"2026-08-07 01:57:12"}
+{"level":"error","message":"POST /api/v1/auth/login -> 401: Invalid email or password","timestamp":"2026-08-07 02:00:35"}
+{"level":"error","message":"POST /api/v1/auth/login -> 500: user.comparePassword is not a function","timestamp":"2026-08-07 02:08:21"}
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-07 12:03:10"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-07 12:03:10"}
+{"level":"error","message":"POST /api/v1/conversations -> 500: HTTP_STATUS_CREATED is not defined","timestamp":"2026-08-07 12:19:53"}
+{"level":"error","message":"POST /api/v1/conversations -> 500: HTTP_STATUS_CREATED is not defined","timestamp":"2026-08-07 12:20:17"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Invalid or expired access token","timestamp":"2026-08-07 12:26:39"}
+{"level":"error","message":"GET /api/v1/conversations -> 500: Cannot access 'skip' before initialization","timestamp":"2026-08-07 12:27:04"}
+{"level":"error","message":"GET /api/v1/conversations -> 500: Cannot access 'skip' before initialization","timestamp":"2026-08-07 12:27:46"}
+{"level":"error","message":"PATCH /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/6a7580fd8a0abea7b0494989","timestamp":"2026-08-07 12:37:21"}
+{"level":"error","message":"PATCH /api/v1/conversations/6a7580fd8a0abea7b0494989/pin -> 401: Invalid or expired access token","timestamp":"2026-08-07 12:42:19"}
+{"level":"error","message":"PATCH /api/v1/conversations/6a7580fd8a0abea7b0494989/pin -> 401: Invalid or expired access token","timestamp":"2026-08-07 12:43:22"}
+{"level":"error","message":"POST /api/v1/conversations/%206a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/%206a7580fd8a0abea7b0494989","timestamp":"2026-08-07 23:19:27"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/6a7580fd8a0abea7b0494989","timestamp":"2026-08-07 23:20:28"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/6a7580fd8a0abea7b0494989","timestamp":"2026-08-07 23:20:44"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 401: Invalid or expired access token","timestamp":"2026-08-08 01:07:55"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 401: Invalid or expired access token","timestamp":"2026-08-08 01:08:52"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/6a7580fd8a0abea7b0494989","timestamp":"2026-08-08 01:09:25"}
+{"level":"error","message":"MongoDB connection failed: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","timestamp":"2026-08-08 01:16:46"}
+{"level":"error","message":"MongoDB connection failed: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","timestamp":"2026-08-08 01:17:22"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/6a7580fd8a0abea7b0494989","timestamp":"2026-08-08 01:18:29"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989 -> 404: Route not found: /api/v1/conversations/6a7580fd8a0abea7b0494989","timestamp":"2026-08-08 01:24:18"}
+{"level":"error","message":"POST /api/v1/conversations/6a7580fd8a0abea7b0494989/messages -> 401: Invalid or expired access token","timestamp":"2026-08-08 01:25:54"}
+{"level":"error","message":"PATCH /api/v1/conversations/6a763862ef0fb7ac6d382ca2/messages -> 404: Route not found: /api/v1/conversations/6a763862ef0fb7ac6d382ca2/messages","timestamp":"2026-08-08 01:29:26"}
+{"level":"error","message":"PATCH /api/v1/conversations/6a763862ef0fb7ac6d382ca2/messages -> 404: Route not found: /api/v1/conversations/6a763862ef0fb7ac6d382ca2/messages","timestamp":"2026-08-08 01:31:52"}
+{"level":"error","message":"AI generation failed: AI provider \"openai\" is not supported","timestamp":"2026-08-08 02:40:58"}
+{"level":"error","message":"AI generation failed: Gemini API error: models/gpt-4o-mini is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.","timestamp":"2026-08-08 02:44:47"}
+{"level":"error","message":"AI generation failed: Gemini API error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.","timestamp":"2026-08-08 02:57:56"}
+{"level":"error","message":"AI generation failed: Gemini API error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.","timestamp":"2026-08-08 02:58:37"}
+{"level":"error","message":"AI generation failed: Gemini API error: models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.","timestamp":"2026-08-08 03:00:24"}
+{"level":"error","message":"AI generation failed: Gemini API error: This model models/gemini-2.5-flash is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.","timestamp":"2026-08-08 03:03:01"}
+{"level":"error","message":"AI generation failed: Gemini API error: This model models/gemini-2.5-flash-lite is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.","timestamp":"2026-08-08 03:05:05"}
+{"level":"error","message":"AI generation failed: Gemini API error: This model models/gemini-2.5-flash-lite is no longer available to new users. Please update your code to use a newer model for the latest features and improvements.","timestamp":"2026-08-08 03:06:51"}
+{"level":"error","message":"POST /api/v1/files -> 404: Route not found: /api/v1/files","timestamp":"2026-08-09 14:02:57"}
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-09 17:17:10"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-09 17:17:11"}
+{"level":"error","message":"POST /api/v1/files -> 401: Invalid or expired access token","timestamp":"2026-08-09 17:18:12"}
+{"level":"error","message":"POST /api/v1/files -> 500: Invalid cloud_name DDdde60gchv","timestamp":"2026-08-09 17:18:44"}
+{"level":"error","message":"POST /api/v1/files -> 500: getaddrinfo ENOTFOUND ac-wp8elny-shard-00-00.vftguqk.mongodb.net","timestamp":"2026-08-09 17:20:27"}
+{"level":"error","message":"POST /api/v1/files -> 401: Invalid or expired access token","timestamp":"2026-08-10 00:15:09"}
+{"level":"error","message":"POST /api/v1/files -> 500: Invalid cloud_name DDdde60gchv","timestamp":"2026-08-10 00:16:01"}
+{"level":"error","message":"File text extraction failed for 6a78cb762464e6955fa65d3d: pdfParse is not a function","timestamp":"2026-08-10 00:18:23"}
+{"level":"error","message":"MongoDB connection failed: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","timestamp":"2026-08-10 00:38:38"}
+{"level":"error","message":"MongoDB connection failed: querySrv ETIMEOUT _mongodb._tcp.cluster0.vftguqk.mongodb.net","timestamp":"2026-08-10 00:44:54"}
+{"level":"error","message":"MongoDB connection failed: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/","timestamp":"2026-08-10 00:45:18"}
+{"level":"error","message":"POST /api/v1/files -> 400: No file was uploaded","timestamp":"2026-08-10 00:54:38"}
+{"level":"error","message":"POST /api/v1/files -> 400: No file was uploaded","timestamp":"2026-08-10 00:54:38"}
+{"level":"error","message":"GET /api/v1/files/6a78d56b4ed7d4e15d47637d -> 401: Access token missing. Please log in.","timestamp":"2026-08-10 01:02:36"}
+{"level":"error","message":"DELETE /api/v1/files/6a78d56b4ed7d4e15d47637d -> 404: File not found","timestamp":"2026-08-10 11:30:18"}
+{"level":"error","message":"DELETE /api/v1/files/6a74f02f6c281428b3955a6c -> 404: File not found","timestamp":"2026-08-10 11:30:50"}
+{"level":"error","message":"MongoDB connection failed: querySrv ECONNREFUSED _mongodb._tcp.cluster0.vftguqk.mongodb.net","timestamp":"2026-08-11 09:58:50"}
+{"level":"error","message":"POST /api/v1/files -> 401: Invalid or expired access token","timestamp":"2026-08-11 10:17:55"}
+{"level":"error","message":"POST /api/v1/auth/login -> 403: This account has been deactivated","timestamp":"2026-08-11 10:18:04"}
+{"level":"error","message":"POST /api/v1/auth/login -> 403: This account has been deactivated","timestamp":"2026-08-11 10:18:32"}
+{"level":"error","message":"POST /api/v1/files -> 401: Invalid or expired access token","timestamp":"2026-08-11 10:25:12"}
+{"level":"error","message":"POST /api/v1/files -> 400: No file was uploaded","timestamp":"2026-08-11 10:26:00"}
+{"level":"error","message":"GET /api/v1/conversations/6a7580fd8a0abea7b0494989/messages -> 404: Conversation not found","timestamp":"2026-08-11 15:14:51"}
+{"level":"error","message":"GET /api/v1/conversations/6a7af0b251869c00a163c5af/messages -> 404: Conversation not found","timestamp":"2026-08-11 15:23:33"}
+{"level":"error","message":"DELETE /api/v1/messages/6a7af01d51869c00a163c5aa/regenerate -> 404: Route not found: /api/v1/messages/6a7af01d51869c00a163c5aa/regenerate","timestamp":"2026-08-11 15:27:05"}
+{"level":"error","message":"POST /api/v1/messages/6a7af01d51869c00a163c5aa/regenerate -> 404: Message not found","timestamp":"2026-08-11 15:27:19"}
+{"level":"error","message":"POST /api/v1/messages/6a7af0b251869c00a163c5af/regenerate -> 400: Only AI responses can be regenerated","timestamp":"2026-08-11 15:29:04"}
+{"level":"error","message":"POST /api/v1/messages/6a7af0bd51869c00a163c5b3/regenerate -> 401: Invalid or expired access token","timestamp":"2026-08-11 15:30:10"}
+{"level":"error","message":"POST /api/v1/messages/6a7af0bd51869c00a163c5b3/regenerate -> 401: Invalid or expired access token","timestamp":"2026-08-11 15:30:41"}
+{"level":"error","message":"GET /socket.io/?EIO=4&transport=websocket -> 404: Route not found: /socket.io/?EIO=4&transport=websocket","timestamp":"2026-08-11 22:05:50"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Invalid or expired access token","timestamp":"2026-08-11 23:35:33"}
+{"level":"error","message":"Socket authentication error: jwt expired","timestamp":"2026-08-12 13:16:45"}
+{"level":"error","message":"Streaming AI generation failed: aiService.generateAIResponseStream is not a function","timestamp":"2026-08-12 13:42:59"}
+{"level":"error","message":"Streaming AI generation failed: aiService.generateAIResponseStream is not a function","timestamp":"2026-08-12 13:47:59"}
+{"level":"error","message":"Streaming AI generation failed: aiService.generateAIResponseStream is not a function","timestamp":"2026-08-12 13:50:17"}
+{"level":"error","message":"Streaming AI generation failed: aiService.generateAIResponseStream is not a function","timestamp":"2026-08-12 13:52:43"}
+{"level":"error","message":"Streaming AI generation failed: aiService.generateAIResponseStream is not a function","timestamp":"2026-08-12 13:56:13"}
+{"level":"error","message":"Socket authentication error: jwt expired","timestamp":"2026-08-12 14:53:01"}
+{"level":"error","message":"Streaming AI generation failed: aiService.generateAIResponseStream is not a function","timestamp":"2026-08-12 14:53:49"}
+{"level":"error","message":"Socket authentication error: jwt expired","timestamp":"2026-08-12 15:28:22"}
+{"level":"error","message":"Streaming AI generation failed: Gemini API error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.","timestamp":"2026-08-12 17:20:52"}
+{"level":"error","message":"MongoDB connection failed: querySrv ECONNREFUSED _mongodb._tcp.cluster0.vftguqk.mongodb.net","timestamp":"2026-08-19 01:04:40"}
+{"level":"error","message":"MongoDB connection failed: querySrv ECONNREFUSED _mongodb._tcp.cluster0.vftguqk.mongodb.net","timestamp":"2026-08-19 01:05:04"}
+{"level":"error","message":"MongoDB connection failed: querySrv ECONNREFUSED _mongodb._tcp.cluster0.vftguqk.mongodb.net","timestamp":"2026-08-19 01:05:09"}
+{"level":"error","message":"MongoDB connection failed: querySrv ECONNREFUSED _mongodb._tcp.cluster0.vftguqk.mongodb.net","timestamp":"2026-08-19 01:06:04"}
+{"level":"error","message":"GET /api/v1/admin/dashboard -> 404: Route not found: /api/v1/admin/dashboard","timestamp":"2026-08-19 01:20:10"}
+{"level":"error","message":"GET /api/v1/admin/dashboard -> 404: Route not found: /api/v1/admin/dashboard","timestamp":"2026-08-19 01:23:14"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Invalid or expired access token","timestamp":"2026-08-19 13:14:34"}
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-19 13:29:18"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-19 13:29:18"}
+{"level":"error","message":"Socket authentication error: jwt expired","timestamp":"2026-08-19 15:28:47"}
+{"level":"error","message":"send_message socket error: Cannot find module 'C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\services\\message.service.js' imported from C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\src\\sockets\\socket.js","timestamp":"2026-08-19 16:52:33"}
+{"level":"error","message":"Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\services\\message.service.js' imported from C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\src\\sockets\\socket.js\n    at finalizeResolution (node:internal/modules/esm/resolve:274:11)\n    at moduleResolve (node:internal/modules/esm/resolve:864:10)\n    at defaultResolve (node:internal/modules/esm/resolve:990:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:718:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:735:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:764:52)\n    at #resolve (node:internal/modules/esm/loader:700:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:620:35)\n    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:649:32)\n    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)","timestamp":"2026-08-19 16:52:33"}
+{"level":"error","message":"send_message socket error: Cannot find module 'C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\services\\message.service.js' imported from C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\src\\sockets\\socket.js","timestamp":"2026-08-19 16:53:04"}
+{"level":"error","message":"Error [ERR_MODULE_NOT_FOUND]: Cannot find module 'C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\services\\message.service.js' imported from C:\\Users\\hp\\OneDrive\\Desktop\\StackChat\\server\\src\\sockets\\socket.js\n    at finalizeResolution (node:internal/modules/esm/resolve:274:11)\n    at moduleResolve (node:internal/modules/esm/resolve:864:10)\n    at defaultResolve (node:internal/modules/esm/resolve:990:11)\n    at #cachedDefaultResolve (node:internal/modules/esm/loader:718:20)\n    at #resolveAndMaybeBlockOnLoaderThread (node:internal/modules/esm/loader:735:38)\n    at ModuleLoader.resolveSync (node:internal/modules/esm/loader:764:52)\n    at #resolve (node:internal/modules/esm/loader:700:17)\n    at ModuleLoader.getOrCreateModuleJob (node:internal/modules/esm/loader:620:35)\n    at onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:649:32)\n    at TracingChannel.tracePromise (node:diagnostics_channel:350:14)","timestamp":"2026-08-19 16:53:04"}
+{"level":"error","message":"Streaming AI generation failed: Gemini API error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.","timestamp":"2026-08-19 17:01:01"}
+{"level":"error","message":"Streaming AI generation failed: Gemini API error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.","timestamp":"2026-08-19 17:06:33"}
+{"level":"error","message":"Streaming AI generation failed: Gemini API error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.","timestamp":"2026-08-19 17:47:01"}
+{"level":"error","message":"Streaming AI generation failed: Gemini API error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.","timestamp":"2026-08-19 18:16:33"}
+{"level":"error","message":"POST /api/v1/notifications -> 404: Route not found: /api/v1/notifications","timestamp":"2026-08-20 13:41:38"}
+{"level":"error","message":"POST /api/v1/notifications -> 404: Route not found: /api/v1/notifications","timestamp":"2026-08-20 13:42:25"}
+{"level":"error","message":"POST /api/v1/reports -> 400: Validation failed","timestamp":"2026-08-20 14:33:02"}
+{"level":"error","message":"POST /api/v1/messages/6a7af0b251869c00a163c5af/continue -> 400: Only AI responses can be continued","timestamp":"2026-08-20 18:49:45"}
+{"level":"error","message":"GET /api/v1/admin/conversations -> 404: Route not found: /api/v1/admin/conversations","timestamp":"2026-08-20 19:09:28"}
+{"level":"error","message":"GET /api/v1/admin/conversations -> 404: Route not found: /api/v1/admin/conversations","timestamp":"2026-08-20 19:12:12"}
+{"level":"error","message":"GET /api/v1/auth/google -> 404: Route not found: /api/v1/auth/google","timestamp":"2026-08-21 11:28:34"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-21 11:28:34"}
+{"level":"error","message":"POST /api/v1/auth/forgot-password -> 500: Failed to send password reset email. Please check server email configuration.","timestamp":"2026-08-23 02:29:21"}
+{"level":"error","message":"SMTP configuration error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-327f923490bsm15192869eec.26 - gsmtp","timestamp":"2026-08-23 02:39:42"}
+{"level":"error","message":"SMTP configuration error: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-327f923615asm9542101eec.29 - gsmtp","timestamp":"2026-08-23 02:40:50"}
+{"level":"error","message":"GET /reset-password?token=b429b77f0295f12287f9329e4ee764a03bdb8115087df1fe1c8b9019d01acba2 -> 404: Route not found: /reset-password?token=b429b77f0295f12287f9329e4ee764a03bdb8115087df1fe1c8b9019d01acba2","timestamp":"2026-08-23 13:48:46"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-23 13:48:46"}
+{"level":"error","message":"POST /api/v1/auth/reset-password -> 400: Reset token is invalid or has expired","timestamp":"2026-08-23 13:51:07"}
+{"level":"error","message":"GET /reset-password?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f -> 404: Route not found: /reset-password?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f","timestamp":"2026-08-23 13:52:37"}
+{"level":"error","message":"POST /api/v1/auth/send-verification-email -> 404: Route not found: /api/v1/auth/send-verification-email","timestamp":"2026-08-23 14:09:49"}
+{"level":"error","message":"POST /api/v1/auth/send-verification-email -> 404: Route not found: /api/v1/auth/send-verification-email","timestamp":"2026-08-23 14:10:08"}
+{"level":"error","message":"GET /reset-password?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f -> 404: Route not found: /reset-password?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f","timestamp":"2026-08-23 14:17:23"}
+{"level":"error","message":"GET /verify-email?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f -> 404: Route not found: /verify-email?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f","timestamp":"2026-08-23 14:18:53"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=c0f54c3244ae912f323612280a18b92c43e629846379af42b211254fa9fbcf0f -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 14:20:01"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=XXXXXXXX -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 14:26:25"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=ACTUAL_TOKEN -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 14:26:36"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=a52d11d2df273f2de7a4a9bdc56124bfd69dd57d25f73acd2325d440825d3e88 -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 14:58:25"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=a52d11d2df273f2de7a4a9bdc56124bfd69dd57d25f73acd2325d440825d3e88 -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 14:58:45"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=a52d11d2df273f2de7a4a9bdc56124bfd69dd57d25f73acd2325d440825d3e88 -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 15:01:43"}
+{"level":"error","message":"GET /api/v1/auth/verify-email?token=a52d11d2df273f2de7a4a9bdc56124bfd69dd57d25f73acd2325d440825d3e88 -> 400: Verification token is invalid or has expired","timestamp":"2026-08-23 15:05:12"}
+{"level":"error","message":"POST /api/v1/auth/login -> 401: Invalid email or password","timestamp":"2026-08-24 02:50:13"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-24 02:57:14"}
+{"level":"error","message":"GET /api/v1/auth/me -> 401: Invalid or expired access token","timestamp":"2026-08-24 03:29:07"}
+{"level":"error","message":"Socket authentication error: jwt expired","timestamp":"2026-08-24 03:36:29"}
+{"level":"error","message":"Socket authentication error: jwt expired","timestamp":"2026-08-24 03:36:29"}
+{"level":"error","message":"GET /api/v1/auth/me -> 401: Invalid or expired access token","timestamp":"2026-08-25 12:50:49"}
+{"level":"error","message":"AI generation stream failed: Gemini API error: This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.","timestamp":"2026-08-25 12:51:23"}
+{"level":"error","message":"GET /api/v1/auth/me -> 401: Invalid or expired access token","timestamp":"2026-08-25 13:13:50"}
+{"level":"error","message":"POST /api/v1/files -> 400: Unsupported file type: text/html","timestamp":"2026-08-25 13:14:52"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/research/start -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/voice/tts -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Invalid or expired access token","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/capabilities -> 401: Invalid or expired access token","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Invalid or expired access token","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Invalid or expired access token","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/places/search?query=coffee -> 401: Invalid or expired access token","timestamp":"2026-08-25 16:25:29"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/research/start -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/voice/tts -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 400: Validation failed","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 400: Please upload a CSV file or provide csvText in body","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/conversations/invalid-id-123 -> 400: Validation failed","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/places/search?query=coffee -> 404: Route not found: /api/v1/places/search?query=coffee","timestamp":"2026-08-25 16:25:56"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/research/run -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 400: Validation failed","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 400: Please upload a CSV file or provide csvText in body","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"GET /api/v1/conversations/invalid-id-123 -> 400: Validation failed","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/places/search -> 503: Places provider (Google Maps/Places API) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/web-search/query -> 503: Web search provider (Tavily/SerpAPI) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/image-generation/generate -> 503: Image generation provider is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 503: Voice TTS provider (OpenAI TTS) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:26:37"}
+{"level":"error","message":"GET /api/v1/capabilities -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:32:02"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/research/run -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 400: Validation failed","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 400: Please upload a CSV file or provide csvText in body","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"GET /api/v1/conversations/invalid-id-123 -> 400: Validation failed","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/places/search -> 503: Places provider (Google Maps/Places API) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/web-search/query -> 503: Web search provider (Tavily/SerpAPI) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/image-generation/generate -> 503: Image generation provider is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 503: Voice TTS provider (OpenAI TTS) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 16:54:02"}
+{"level":"error","message":"GET /api/v1/health -> 404: Route not found: /api/v1/health","timestamp":"2026-08-25 17:37:19"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/research/run -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 401: Access token missing. Please log in.","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 400: Validation failed","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 400: Please upload a CSV file or provide csvText in body","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"GET /api/v1/conversations/invalid-id-123 -> 400: Validation failed","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/places/search -> 503: Places provider (Google Maps/Places API) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/web-search/query -> 503: Web search provider (Tavily/SerpAPI) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/image-generation/generate -> 503: Image generation provider is NOT_CONFIGURED on the server","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 503: Voice TTS provider (OpenAI TTS) is NOT_CONFIGURED on the server","timestamp":"2026-08-25 17:37:50"}
+{"level":"error","message":"POST /api/v1/conversations/undefined/messages -> 400: Validation failed","timestamp":"2026-08-25 17:53:13"}
+{"level":"error","message":"POST /api/v1/conversations/undefined/messages -> 400: Validation failed","timestamp":"2026-08-25 17:59:51"}
+{"level":"error","message":"POST /api/v1/auth/register -> 409: An account with this email already exists","timestamp":"2026-08-25 18:01:21"}
+{"level":"error","message":"POST /api/v1/auth/login -> 401: Invalid email or password","timestamp":"2026-08-25 18:13:23"}
+{"level":"error","message":"POST /api/v1/conversations/undefined/messages -> 400: Validation failed","timestamp":"2026-08-25 18:13:49"}
+{"level":"error","message":"POST /api/v1/auth/register -> 409: An account with this email already exists","timestamp":"2026-08-25 18:15:27"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-327f92359c9sm37047785eec.27 - gsmtp","timestamp":"2026-08-25 18:17:49"}
+{"level":"error","message":"POST /api/v1/conversations/undefined/messages -> 400: Validation failed","timestamp":"2026-08-25 18:17:59"}
+{"level":"error","message":"AI generation failed: Gemini API error: This model models/gemini-2.5-flash-lite is no longer available to new users. Please update your code to use models/gemini-3.5-flash-lite for the latest features and improvements.","timestamp":"2026-08-25 18:18:29"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-327f92359c9sm37062934eec.27 - gsmtp","timestamp":"2026-08-25 18:19:45"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-141a8e118fasm16269838c88.0 - gsmtp","timestamp":"2026-08-27 21:06:48"}
+{"level":"error","message":"GET / -> 404: Route not found: /","timestamp":"2026-08-27 21:21:11"}
+{"level":"error","message":"GET /favicon.ico -> 404: Route not found: /favicon.ico","timestamp":"2026-08-27 21:21:11"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-3283d884d5esm20081291eec.17 - gsmtp","timestamp":"2026-08-27 21:22:29"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-141a9035c06sm16409878c88.10 - gsmtp","timestamp":"2026-08-27 21:29:37"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-3283d60d25esm23411911eec.4 - gsmtp","timestamp":"2026-08-27 21:34:52"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-3283d60b59dsm21042631eec.3 - gsmtp","timestamp":"2026-08-27 21:36:47"}
+{"level":"error","message":"❌ SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-141a8f47d8csm17440605c88.8 - gsmtp","timestamp":"2026-08-27 21:38:02"}
+{"level":"error","message":"? Real SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-3286f9e3cf8sm1917114eec.24 - gsmtp. Switching to Ethereal Test Email...","timestamp":"2026-08-28 10:55:38"}
+{"level":"error","message":"? Real SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-3286f80a0a5sm2110773eec.11 - gsmtp. Switching to Ethereal Test Email...","timestamp":"2026-08-28 11:01:02"}
+{"level":"error","message":"? Real SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-142e0df264csm4629170c88.14 - gsmtp. Switching to Ethereal Test Email...","timestamp":"2026-08-28 11:03:27"}
