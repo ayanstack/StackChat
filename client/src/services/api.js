@@ -1,4 +1,5 @@
-const API_BASE = "/api/v1";
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
+const API_BASE = `${BACKEND_URL}/api/v1`;
 
 let accessToken = localStorage.getItem("stackchat_token") || "";
 
