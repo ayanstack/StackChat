@@ -1,4 +1,5 @@
 import path from "path";
+import { existsSync } from "fs";
 import { fileURLToPath } from "url";
 import express from "express";
 import cookieParser from "cookie-parser";
@@ -42,7 +43,27 @@ import { env } from "./config/env.js";
 
 const app = express();
 
-// Security
+// ──────────────────────────────────────────────────────────
+// 1. STATIC FILES — served FIRST, before ANY middleware
+//    so that CORS / Helmet / rate-limiter never intercept them.
+// ──────────────────────────────────────────────────────────
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const clientDist = path.resolve(__dirname, "../../client/dist");
+
+// Serve static files with correct MIME types (express.static handles this)
+app.use(express.static(clientDist, { maxAge: "1y", immutable: true }));
+
+// Guard: if a request to /assets/* was NOT served by express.static
+// (file missing), return a plain 404 instead of falling through
+// to the SPA fallback / error-handler (which returns JSON → MIME error).
+app.use("/assets", (_req, res) => {
+  res.status(404).type("text").send("Asset not found");
+});
+
+// ──────────────────────────────────────────────────────────
+// 2. SECURITY middleware (only applies to API + SPA routes)
+// ──────────────────────────────────────────────────────────
 app.use(helmetMiddleware);
 app.use(corsMiddleware);
 app.use(globalRateLimiter);
@@ -57,7 +78,9 @@ app.use(compression());
 app.use(sanitizeMiddleware);
 app.use(morgan("dev", { stream: logger.stream }));
 
-// Health check
+// ──────────────────────────────────────────────────────────
+// 3. HEALTH CHECK
+// ──────────────────────────────────────────────────────────
 app.get("/health", (req, res) => {
   new ApiResponse(
     200,
@@ -69,10 +92,11 @@ app.get("/health", (req, res) => {
   ).send(res);
 });
 
-// API base path
+// ──────────────────────────────────────────────────────────
+// 4. API ROUTES
+// ──────────────────────────────────────────────────────────
 const API_BASE = `/api/${env.API_VERSION}`;
 
-// Routes
 app.use(`${API_BASE}/auth`, authRoutes);
 app.use(`${API_BASE}/users`, userRoutes);
 app.use(`${API_BASE}/conversations`, conversationRoutes);
@@ -80,34 +104,35 @@ app.use(`${API_BASE}/messages`, messageStandaloneRoutes);
 app.use(`${API_BASE}/files`, fileRoutes);
 app.use(`${API_BASE}/ai`, aiUtilsRoutes);
 app.use(`${API_BASE}/analytics`, analyticsRoutes);
-  app.use(`${API_BASE}/csv`, csvRoutes);
-  app.use(`${API_BASE}/memory`, memoryRoutes);
-  app.use(`${API_BASE}/capabilities`, capabilitiesRoutes);
-  app.use(`${API_BASE}/vision`, visionRoutes);
-  app.use(`${API_BASE}/image-generation`, imageGenerationRoutes);
-  app.use(`${API_BASE}/web-search`, webSearchRoutes);
-  app.use(`${API_BASE}/places`, placesRoutes);
-  app.use(`${API_BASE}/voice`, voiceRoutes);
-  app.use(`${API_BASE}/research`, researchRoutes);
-  app.use(`${API_BASE}/integrations`, integrationsRoutes);
+app.use(`${API_BASE}/csv`, csvRoutes);
+app.use(`${API_BASE}/memory`, memoryRoutes);
+app.use(`${API_BASE}/capabilities`, capabilitiesRoutes);
+app.use(`${API_BASE}/vision`, visionRoutes);
+app.use(`${API_BASE}/image-generation`, imageGenerationRoutes);
+app.use(`${API_BASE}/web-search`, webSearchRoutes);
+app.use(`${API_BASE}/places`, placesRoutes);
+app.use(`${API_BASE}/voice`, voiceRoutes);
+app.use(`${API_BASE}/research`, researchRoutes);
+app.use(`${API_BASE}/integrations`, integrationsRoutes);
 
-
-
-// Get __dirname in ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Serve static frontend files
-const clientDist = path.join(__dirname, "../../client/dist");
-app.use(express.static(clientDist));
-
+// ──────────────────────────────────────────────────────────
+// 5. SPA FALLBACK — only for browser navigation routes,
+//    never for API or /assets paths.
+// ──────────────────────────────────────────────────────────
 app.get("*", (req, res, next) => {
+  // Let API 404s fall through to the notFoundHandler below
   if (req.path.startsWith(API_BASE)) {
     return next();
   }
-  res.sendFile(path.join(clientDist, "index.html"));
+  const indexPath = path.join(clientDist, "index.html");
+  if (existsSync(indexPath)) {
+    return res.sendFile(indexPath);
+  }
+  // index.html doesn't exist yet (build hasn't run)
+  return res.status(503).type("text").send("App is starting up — please retry in a moment.");
 });
-// 404
+
+// 404 (API routes only at this point)
 app.use(notFoundHandler);
 
 // Global error handler
