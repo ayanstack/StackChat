@@ -52,9 +52,18 @@ function isValidObjectId(id) {
 // =====================================================
 
 export function initializeSocket(server) {
+  const allowedOrigins = env.CLIENT_URL
+    ? env.CLIENT_URL.split(",").map((o) => o.trim())
+    : ["http://localhost:5000"];
+
   io = new Server(server, {
     cors: {
-      origin: env.CLIENT_URL,
+      origin: (origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        if (/\.vercel\.app$/.test(origin)) return callback(null, true);
+        callback(new Error("Not allowed by CORS"));
+      },
       credentials: true,
     },
   });

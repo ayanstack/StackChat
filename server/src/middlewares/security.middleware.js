@@ -21,8 +21,23 @@ export const helmetMiddleware = helmet({
 });
 
 // CORS: sirf humara frontend hi API call kar paaye, koi aur website nahi
+const allowedOrigins = env.CLIENT_URL
+  ? env.CLIENT_URL.split(",").map((o) => o.trim())
+  : ["http://localhost:5000"];
+
 export const corsMiddleware = cors({
-  origin: env.CLIENT_URL,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, server-to-server, Postman)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    // Allow any *.vercel.app subdomain for preview deployments
+    if (/\.vercel\.app$/.test(origin)) {
+      return callback(null, true);
+    }
+    callback(new Error("Not allowed by CORS"));
+  },
   credentials: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
