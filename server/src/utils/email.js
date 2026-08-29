@@ -14,7 +14,7 @@ const initTransporter = async () => {
         secure: false,
         auth: {
           user: env.SMTP_USER,
-          pass: env.SMTP_PASS,
+          pass: env.SMTP_PASS ? env.SMTP_PASS.replace(/\s+/g, "") : "",
         },
         tls: { rejectUnauthorized: false },
       });

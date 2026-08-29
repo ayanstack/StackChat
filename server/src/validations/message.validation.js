@@ -15,6 +15,7 @@ export const sendMessageSchema = z.object({
   body: z.object({
     content: z.string().trim().min(1, "Message cannot be empty").max(50000),
     attachmentIds: z.array(objectId).max(5, "Maximum 5 attachments allowed").optional().default([]),
+    model: z.string().optional(),
   }),
 });
 

@@ -15,10 +15,12 @@ import {
   FileSpreadsheet,
   Code2,
   CornerDownLeft,
+  X,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSocket } from "../context/SocketContext.jsx";
-import { messageApi, conversationApi } from "../services/api.js";
+import { messageApi, conversationApi, fileApi } from "../services/api.js";
 
 const QUICK_STARTERS = [
   {
@@ -56,8 +58,14 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
   const [streamingContent, setStreamingContent] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
+  const [attachments, setAttachments] = useState([]);
+  const [isWebSearchEnabled, setIsWebSearchEnabled] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+
   const messagesEndRef = useRef(null);
   const textareaRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const recognitionRef = useRef(null);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -122,6 +130,91 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     scrollToBottom();
   }, [messages, streamingContent]);
 
+  // --- Voice Recognition Setup ---
+  useEffect(() => {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRecognition) {
+      const recognition = new SpeechRecognition();
+      recognition.continuous = true;
+      recognition.interimResults = true;
+      recognition.lang = "en-US";
+      
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        let finalTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const transcript = event.results[i][0].transcript;
+          if (event.results[i].isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        
+        if (finalTranscript) {
+          setInput((prev) => (prev + ' ' + finalTranscript).trim());
+        }
+      };
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error", event.error);
+        setIsRecording(false);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+    }
+  }, []);
+
+  const toggleVoiceRecording = () => {
+    if (!recognitionRef.current) {
+      alert("Speech recognition is not supported in this browser.");
+      return;
+    }
+    
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+    } else {
+      recognitionRef.current.start();
+      setIsRecording(true);
+    }
+  };
+
+  const toggleWebSearch = () => {
+    setIsWebSearchEnabled((prev) => !prev);
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      
+      const res = await fileApi.upload(formData);
+      if (res && res.data && res.data.file) {
+        setAttachments((prev) => [...prev, res.data.file]);
+      }
+    } catch (err) {
+      console.error("File upload failed:", err);
+      alert("Failed to upload file");
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const removeAttachment = (fileId) => {
+    setAttachments((prev) => prev.filter(f => f._id !== fileId));
+  };
+
   const handleSendMessage = async (customPrompt) => {
     const textToSend = typeof customPrompt === "string" ? customPrompt : input.trim();
     if (!textToSend || loading || isStreaming) return;
@@ -152,7 +245,9 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       }
     }
 
+    const attachmentIds = attachments.map((a) => a._id);
     setInput("");
+    setAttachments([]);
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
     }
@@ -161,13 +256,18 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       _id: `temp-${Date.now()}`,
       role: "user",
       content: textToSend,
+      attachments,
       createdAt: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
     try {
       setLoading(true);
-      const res = await messageApi.send(convId, { content: textToSend, model: selectedModel });
+      const res = await messageApi.send(convId, {
+        content: textToSend,
+        attachmentIds,
+        model: selectedModel,
+      });
       if (res && res.data) {
         // Backend returns { userMessage, assistantMessage }
         const aiReply = res.data.assistantMessage || res.data.aiMessage || res.data.reply;
@@ -378,7 +478,48 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
       {/* Floating Composer Dock */}
       <div className="composer-dock-container">
+        <input
+          type="file"
+          ref={fileInputRef}
+          onChange={handleFileUpload}
+          style={{ display: "none" }}
+        />
+
         <div className="composer-box">
+          {attachments.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, padding: "8px 12px 0 12px" }}>
+              {attachments.map((att) => (
+                <div
+                  key={att._id}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "4px 8px",
+                    background: "var(--bg-surface-elevated)",
+                    border: "1px solid var(--border-hairline)",
+                    borderRadius: "var(--radius-sm)",
+                    fontSize: "0.75rem",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  <FileText size={12} color="var(--accent-sky)" />
+                  <span style={{ maxWidth: 160, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {att.originalName || att.filename || "Attached file"}
+                  </span>
+                  <button
+                    type="button"
+                    className="btn-icon"
+                    onClick={() => removeAttachment(att._id)}
+                    style={{ width: 16, height: 16, padding: 0 }}
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
           <textarea
             ref={textareaRef}
             className="composer-textarea"
@@ -396,13 +537,41 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
           <div className="composer-toolbar">
             <div className="composer-tools-group">
-              <button className="btn-icon" title="Attach file or dataset" style={{ width: 28, height: 28 }}>
+              <button
+                type="button"
+                className="btn-icon"
+                title="Attach file or dataset"
+                onClick={() => fileInputRef.current?.click()}
+                style={{ width: 28, height: 28 }}
+              >
                 <Paperclip size={13} />
               </button>
-              <button className="btn-icon" title="Live Web grounding" style={{ width: 28, height: 28 }}>
+              <button
+                type="button"
+                className={`btn-icon ${isWebSearchEnabled ? "active" : ""}`}
+                title="Live Web grounding"
+                onClick={toggleWebSearch}
+                style={{
+                  width: 28,
+                  height: 28,
+                  color: isWebSearchEnabled ? "var(--accent-sky)" : undefined,
+                  background: isWebSearchEnabled ? "rgba(56, 189, 248, 0.15)" : undefined,
+                }}
+              >
                 <Globe size={13} />
               </button>
-              <button className="btn-icon" title="Voice dictation" style={{ width: 28, height: 28 }}>
+              <button
+                type="button"
+                className={`btn-icon ${isRecording ? "active" : ""}`}
+                title={isRecording ? "Listening... click to stop" : "Voice dictation"}
+                onClick={toggleVoiceRecording}
+                style={{
+                  width: 28,
+                  height: 28,
+                  color: isRecording ? "#ef4444" : undefined,
+                  background: isRecording ? "rgba(239, 68, 68, 0.15)" : undefined,
+                }}
+              >
                 <Mic size={13} />
               </button>
             </div>
@@ -416,7 +585,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
                 type="button"
                 className="btn btn-primary"
                 onClick={() => handleSendMessage()}
-                disabled={!input.trim() || loading || isStreaming}
+                disabled={(!input.trim() && attachments.length === 0) || loading || isStreaming}
                 style={{ width: 28, height: 28, padding: 0, borderRadius: "var(--radius-sm)" }}
               >
                 <ArrowUp size={14} />

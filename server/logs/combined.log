@@ -2554,3 +2554,89 @@
 {"level":"http","message":"\u001b[0mGET /assets/index-CFnXJeMR.js \u001b[32m200\u001b[0m 3.436 ms - -\u001b[0m","timestamp":"2026-08-29 13:48:19"}
 {"level":"warn","message":"MongoDB disconnected","timestamp":"2026-08-29 14:32:08"}
 {"level":"warn","message":"MongoDB disconnected","timestamp":"2026-08-29 14:43:52"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2026-08-29 14:48:29"}
+{"level":"http","message":"\u001b[0mGET /health \u001b[32m200\u001b[0m 4.522 ms - 108\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/unknown-endpoint \u001b[33m404\u001b[0m 48.701 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/conversations \u001b[33m401\u001b[0m 8.001 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/memory \u001b[33m401\u001b[0m 2.135 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/integrations \u001b[33m401\u001b[0m 2.144 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/analytics/me \u001b[33m401\u001b[0m 2.147 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/analyze \u001b[33m401\u001b[0m 2.238 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/ai/summarize \u001b[33m401\u001b[0m 2.451 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/vision/analyze \u001b[33m401\u001b[0m 2.568 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/research/run -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/research/run \u001b[33m401\u001b[0m 2.568 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/voice/synthesize \u001b[33m401\u001b[0m 2.974 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/auth/register \u001b[33m400\u001b[0m 5.580 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 400: Validation failed","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/ai/summarize \u001b[33m400\u001b[0m 6.199 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 400: Please upload a CSV file or provide csvText in body","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/analyze \u001b[33m400\u001b[0m 6.853 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"GET /api/v1/conversations/invalid-id-123 -> 400: Validation failed","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/conversations/invalid-id-123 \u001b[33m400\u001b[0m 2.337 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/capabilities \u001b[32m200\u001b[0m 1.645 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mGET /api/v1/integrations \u001b[32m200\u001b[0m 1.349 ms - 623\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/analyze \u001b[32m200\u001b[0m 2.627 ms - 1009\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/chart \u001b[32m200\u001b[0m 2.771 ms - 290\u001b[0m","timestamp":"2026-08-29 21:13:32"}
+{"level":"error","message":"POST /api/v1/places/search -> 503: Places provider (Google Maps/Places API) is NOT_CONFIGURED on the server","timestamp":"2026-08-29 21:13:33"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/places/search \u001b[31m503\u001b[0m 7.581 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:33"}
+{"level":"error","message":"POST /api/v1/web-search/query -> 503: Web search provider (Tavily/SerpAPI) is NOT_CONFIGURED on the server","timestamp":"2026-08-29 21:13:33"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/web-search/query \u001b[31m503\u001b[0m 7.229 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:33"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/image-generation/generate \u001b[32m200\u001b[0m 1.107 ms - 320\u001b[0m","timestamp":"2026-08-29 21:13:33"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 503: Voice TTS provider (OpenAI TTS) is NOT_CONFIGURED on the server","timestamp":"2026-08-29 21:13:33"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/voice/synthesize \u001b[31m503\u001b[0m 5.727 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:33"}
+{"level":"error","message":"? Real SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials 5a478bee46e88-3286f7be607sm16895159eec.10 - gsmtp. Switching to Ethereal Test Email...","timestamp":"2026-08-29 21:13:34"}
+{"level":"info","message":"? Ethereal Test SMTP connected: a4guu577jeq5tcoc@ethereal.email","timestamp":"2026-08-29 21:13:35"}
+{"level":"http","message":"\u001b[0mGET /health \u001b[32m200\u001b[0m 2.279 ms - 108\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"GET /api/v1/unknown-endpoint -> 404: Route not found: /api/v1/unknown-endpoint","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/unknown-endpoint \u001b[33m404\u001b[0m 25.613 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"GET /api/v1/conversations -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/conversations \u001b[33m401\u001b[0m 9.436 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"GET /api/v1/memory -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/memory \u001b[33m401\u001b[0m 3.357 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"GET /api/v1/integrations -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/integrations \u001b[33m401\u001b[0m 3.196 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"GET /api/v1/analytics/me -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/analytics/me \u001b[33m401\u001b[0m 3.110 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/analyze \u001b[33m401\u001b[0m 3.399 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/ai/summarize \u001b[33m401\u001b[0m 2.789 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/vision/analyze -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/vision/analyze \u001b[33m401\u001b[0m 1.677 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/research/run -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/research/run \u001b[33m401\u001b[0m 3.877 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 401: Access token missing. Please log in.","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/voice/synthesize \u001b[33m401\u001b[0m 3.167 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/auth/register -> 400: Validation failed","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/auth/register \u001b[33m400\u001b[0m 6.575 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/ai/summarize -> 400: Validation failed","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/ai/summarize \u001b[33m400\u001b[0m 5.878 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/csv/analyze -> 400: Please upload a CSV file or provide csvText in body","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/analyze \u001b[33m400\u001b[0m 6.217 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"GET /api/v1/conversations/invalid-id-123 -> 400: Validation failed","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/conversations/invalid-id-123 \u001b[33m400\u001b[0m 4.133 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/capabilities \u001b[32m200\u001b[0m 2.176 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mGET /api/v1/integrations \u001b[32m200\u001b[0m 1.287 ms - 623\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/analyze \u001b[32m200\u001b[0m 2.437 ms - 1009\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/csv/chart \u001b[32m200\u001b[0m 2.791 ms - 290\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/places/search -> 503: Places provider (Google Maps/Places API) is NOT_CONFIGURED on the server","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/places/search \u001b[31m503\u001b[0m 7.326 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/web-search/query -> 503: Web search provider (Tavily/SerpAPI) is NOT_CONFIGURED on the server","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/web-search/query \u001b[31m503\u001b[0m 6.566 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/image-generation/generate \u001b[32m200\u001b[0m 1.534 ms - 320\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"POST /api/v1/voice/synthesize -> 503: Voice TTS provider (OpenAI TTS) is NOT_CONFIGURED on the server","timestamp":"2026-08-29 21:13:52"}
+{"level":"http","message":"\u001b[0mPOST /api/v1/voice/synthesize \u001b[31m503\u001b[0m 5.088 ms - -\u001b[0m","timestamp":"2026-08-29 21:13:52"}
+{"level":"error","message":"? Real SMTP connection failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-142e0d2e465sm23792511c88.4 - gsmtp. Switching to Ethereal Test Email...","timestamp":"2026-08-29 21:13:54"}
+{"level":"info","message":"? Ethereal Test SMTP connected: g3c2hx2howbwb6y6@ethereal.email","timestamp":"2026-08-29 21:13:54"}
+{"level":"error","message":"? Email sending failed: Invalid login: 535-5.7.8 Username and Password not accepted. For more information, go to\n535 5.7.8  https://support.google.com/mail/?p=BadCredentials a92af1059eb24-142e0d2e465sm23808828c88.4 - gsmtp","timestamp":"2026-08-29 21:16:04"}

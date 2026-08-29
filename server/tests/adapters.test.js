@@ -5,13 +5,11 @@ import voiceService from "../src/services/voice.service.js";
 import ApiError from "../src/utils/ApiError.js";
 
 describe("Provider Adapters and NOT_CONFIGURED Behavior Tests", () => {
-  test("Image generation should throw 503 when providers not configured", async () => {
-    // If no OPENAI_API_KEY and STABILITY_API_KEY
-    if (!process.env.OPENAI_API_KEY && !process.env.STABILITY_API_KEY) {
-      await expect(
-        imageGenerationService.generateImage({ prompt: "A sunset over mountains" })
-      ).rejects.toThrow();
-    }
+  test("Image generation should handle generation or use fallback provider when keys not configured", async () => {
+    const result = await imageGenerationService.generateImage({ prompt: "A sunset over mountains" });
+    expect(result).toHaveProperty("provider");
+    expect(result).toHaveProperty("images");
+    expect(result.images.length).toBeGreaterThan(0);
   });
 
   test("Web search should throw 503 when search providers not configured", async () => {

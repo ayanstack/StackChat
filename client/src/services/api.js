@@ -94,6 +94,13 @@ export const messageApi = {
 };
 
 // ----------------------------------------------------
+// FILES API
+// ----------------------------------------------------
+export const fileApi = {
+  upload: (formData) => request("/files", { method: "POST", body: formData }),
+};
+
+// ----------------------------------------------------
 // FOLDERS API
 // ----------------------------------------------------
 export const folderApi = {
@@ -220,6 +227,7 @@ export default {
   auth: authApi,
   conversations: conversationApi,
   messages: messageApi,
+  files: fileApi,
   folders: folderApi,
   csv: csvApi,
   memory: memoryApi,

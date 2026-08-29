@@ -12,6 +12,8 @@ import {
 
 import { env } from "../config/env.js";
 import { sendEmail } from "../utils/email.js";
+import logger from "../logger/logger.js";
+import notificationService from "./notification.service.js";
 
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -78,6 +80,48 @@ async function login({ email, password }, meta = {}) {
     await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
+    // 1. Create in-app notification for the user
+    try {
+      await notificationService.createNotification(user._id, {
+        title: "Security Alert: Failed Login Attempt",
+        message: `An unsuccessful login attempt was detected on your account from IP ${meta.ip || "unknown"}.`,
+        type: "warning",
+      });
+    } catch (notifErr) {
+      logger.error(`Failed to create in-app notification on failed login: ${notifErr.message}`);
+    }
+
+    // 2. Send security alert email to user's Gmail
+    const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #dc2626; margin-bottom: 8px;">⚠️ Security Alert: Failed Login Attempt</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">StackChat Account Protection</p>
+        </div>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Hello <strong>${user.name || "User"}</strong>,</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">We detected an unsuccessful login attempt to your StackChat account with an incorrect password.</p>
+        <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin: 20px 0; border-radius: 6px;">
+          <p style="margin: 4px 0; font-size: 14px; color: #991b1b;"><strong>Time:</strong> ${timeString}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #991b1b;"><strong>IP Address:</strong> ${meta.ip || "Unknown"}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #991b1b;"><strong>Device / Browser:</strong> ${meta.userAgent || "Unknown"}</p>
+        </div>
+        <p style="color: #374151; font-size: 14px; line-height: 1.5;">If this was you, please ensure you enter your correct password or use the <strong>Forgot Password?</strong> feature on the sign-in screen.</p>
+        <p style="color: #dc2626; font-size: 14px; line-height: 1.5; font-weight: bold;">If you did not make this attempt, someone else may be trying to access your account. We recommend resetting your password immediately.</p>
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">— StackChat Security Team</p>
+      </div>
+    `;
+
+    // Fire email alert
+    sendEmail(
+      user.email,
+      "Security Alert: Failed Login Attempt - StackChat",
+      emailHtml
+    ).catch((mailErr) => {
+      logger.error(`Failed to send security alert email: ${mailErr.message}`);
+    });
+
     throw ApiError.unauthorized(
       "Invalid email or password"
     );
