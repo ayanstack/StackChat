@@ -60,6 +60,39 @@ async function login({ email, password }, meta = {}) {
   }).select("+password");
 
   if (!user) {
+    try {
+      const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+      const emailHtml = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
+          <div style="text-align: center; margin-bottom: 20px;">
+            <h2 style="color: #dc2626; margin-bottom: 8px;">⚠️ Security Alert: Login Attempt</h2>
+            <p style="color: #6b7280; font-size: 14px; margin: 0;">StackChat Account Protection</p>
+          </div>
+          <p style="color: #374151; font-size: 15px; line-height: 1.5;">Hello,</p>
+          <p style="color: #374151; font-size: 15px; line-height: 1.5;">We detected a login attempt using your email address on <strong>StackChat</strong>.</p>
+          <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 16px; margin: 20px 0; border-radius: 6px;">
+            <p style="margin: 4px 0; font-size: 14px; color: #991b1b;"><strong>Time:</strong> ${timeString}</p>
+            <p style="margin: 4px 0; font-size: 14px; color: #991b1b;"><strong>IP Address:</strong> ${meta.ip || "Unknown"}</p>
+            <p style="margin: 4px 0; font-size: 14px; color: #991b1b;"><strong>Device / Browser:</strong> ${meta.userAgent || "Unknown"}</p>
+          </div>
+          <p style="color: #374151; font-size: 14px; line-height: 1.5;">If you do not have an account or did not attempt to sign in, you can safely ignore this email.</p>
+          <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">— StackChat Security Team</p>
+        </div>
+      `;
+
+      await Promise.race([
+        sendEmail(
+          normalizedEmail,
+          "Security Alert: Login Attempt - StackChat",
+          emailHtml
+        ),
+        new Promise((resolve) => setTimeout(resolve, 2500)),
+      ]);
+    } catch (mailErr) {
+      logger.error(`Failed to send security alert email for unregistered user: ${mailErr.message}`);
+    }
+
     throw ApiError.unauthorized("Invalid email or password");
   }
 
