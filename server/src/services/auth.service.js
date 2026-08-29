@@ -81,14 +81,11 @@ async function login({ email, password }, meta = {}) {
         </div>
       `;
 
-      await Promise.race([
-        sendEmail(
-          normalizedEmail,
-          "Security Alert: Login Attempt - StackChat",
-          emailHtml
-        ),
-        new Promise((resolve) => setTimeout(resolve, 2500)),
-      ]);
+      await sendEmail(
+        normalizedEmail,
+        "Security Alert: Login Attempt - StackChat",
+        emailHtml
+      );
     } catch (mailErr) {
       logger.error(`Failed to send security alert email for unregistered user: ${mailErr.message}`);
     }
@@ -147,14 +144,11 @@ async function login({ email, password }, meta = {}) {
         </div>
       `;
 
-      await Promise.race([
-        sendEmail(
-          user.email,
-          "Security Alert: Failed Login Attempt - StackChat",
-          emailHtml
-        ),
-        new Promise((resolve) => setTimeout(resolve, 2500)),
-      ]);
+      await sendEmail(
+        user.email,
+        "Security Alert: Failed Login Attempt - StackChat",
+        emailHtml
+      );
     } catch (mailErr) {
       logger.error(`Failed to send security alert email: ${mailErr.message}`);
     }
