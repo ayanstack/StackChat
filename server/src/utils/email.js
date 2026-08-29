@@ -2,75 +2,68 @@ import nodemailer from "nodemailer";
 import { env } from "../config/env.js";
 import logger from "../logger/logger.js";
 
-let transporter;
+let testTransporter = null;
 
-// Initialize Ethereal (Test) Account or Real SMTP
-const initTransporter = async () => {
-  try {
-    if (env.SMTP_USER && env.SMTP_PASS) {
-      transporter = nodemailer.createTransport({
-        host: env.SMTP_HOST || "smtp.gmail.com",
-        port: Number(env.SMTP_PORT) || 587,
-        secure: false,
-        auth: {
-          user: env.SMTP_USER,
-          pass: env.SMTP_PASS ? env.SMTP_PASS.replace(/\s+/g, "") : "",
-        },
-        connectionTimeout: 5000,
-        greetingTimeout: 5000,
-        socketTimeout: 5000,
-        tls: { rejectUnauthorized: false },
-      });
-      
-      await transporter.verify();
-      logger.info(`? SMTP connected successfully: ${env.SMTP_USER}`);
-      return;
-    }
-  } catch (error) {
-    logger.error(`? Real SMTP connection failed: ${error.message}. Switching to Ethereal Test Email...`);
+const getTransporter = () => {
+  const user = env.SMTP_USER ? env.SMTP_USER.trim() : "";
+  const pass = env.SMTP_PASS ? env.SMTP_PASS.trim().replace(/\s+/g, "") : "";
+
+  if (user && pass) {
+    return nodemailer.createTransport({
+      host: env.SMTP_HOST || "smtp.gmail.com",
+      port: Number(env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user,
+        pass,
+      },
+      connectionTimeout: 10000,
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
+      tls: { rejectUnauthorized: false },
+    });
   }
 
-  // Fallback to Ethereal
-  let testAccount = await nodemailer.createTestAccount();
-  transporter = nodemailer.createTransport({
-    host: "smtp.ethereal.email",
-    port: 587,
-    secure: false, // true for 465, false for other ports
-    auth: {
-      user: testAccount.user, // generated ethereal user
-      pass: testAccount.pass, // generated ethereal password
-    },
-  });
-  logger.info(`? Ethereal Test SMTP connected: ${testAccount.user}`);
+  return null;
 };
-
-initTransporter();
 
 // Send email
 export const sendEmail = async (to, subject, html) => {
   try {
-    if (!transporter) {
-      await initTransporter();
+    let activeTransporter = getTransporter();
+
+    // Fallback to Ethereal only if real SMTP credentials are missing
+    if (!activeTransporter) {
+      if (!testTransporter) {
+        const testAccount = await nodemailer.createTestAccount();
+        testTransporter = nodemailer.createTransport({
+          host: "smtp.ethereal.email",
+          port: 587,
+          secure: false,
+          auth: {
+            user: testAccount.user,
+            pass: testAccount.pass,
+          },
+        });
+        logger.info(`📧 Ethereal Test SMTP initialized: ${testAccount.user}`);
+      }
+      activeTransporter = testTransporter;
     }
 
-    const info = await transporter.sendMail({
-      from: `"${env.EMAIL_FROM_NAME || "StackChat"}" <${env.EMAIL_FROM || "test@stackchat.com"}>`,
+    const fromAddress = env.EMAIL_FROM || env.SMTP_USER || "noreply@stackchat.com";
+    const fromName = env.EMAIL_FROM_NAME || "StackChat Security";
+
+    const info = await activeTransporter.sendMail({
+      from: `"${fromName}" <${fromAddress}>`,
       to,
       subject,
       html,
     });
 
-    logger.info(`? Email sent successfully to ${to}`);
-    logger.info(`Message ID: ${info.messageId}`);
-    
-    // Log the preview URL for Ethereal emails
-    if (info.messageId && transporter.options.host === 'smtp.ethereal.email') {
-      logger.info(`?? Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
-    }
-
+    logger.info(`✅ Email sent successfully to ${to} (MessageID: ${info.messageId})`);
     return true;
   } catch (error) {
-    logger.error(`? Email sending failed: ${error.message}`);
+    logger.error(`❌ Email sending failed to ${to}: ${error.message}`);
     return false;
   }
 };
