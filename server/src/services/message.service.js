@@ -83,12 +83,17 @@ async function sendMessage(
   userId,
   conversationId,
   content,
-  attachmentIds = []
+  attachmentIds = [],
+  model = null
 ) {
   const conversation = await assertConversationOwnership(
     userId,
     conversationId
   );
+
+  if (model) {
+    conversation.model = model;
+  }
 
   const attachments = await validateAttachments(userId, attachmentIds);
 
@@ -121,12 +126,16 @@ async function sendMessageStream(
   userId,
   conversationId,
   content,
-  attachmentIds = []
+  attachmentIds = [],
+  model = null
 ) {
   const io = getIO();
   const room = `conversation:${conversationId}`;
 
   const conversation = await assertConversationOwnership(userId, conversationId);
+  if (model) {
+    conversation.model = model;
+  }
   const attachments = await validateAttachments(userId, attachmentIds);
 
   const userMessage = await Message.create({

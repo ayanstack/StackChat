@@ -47,7 +47,7 @@ const QUICK_STARTERS = [
   },
 ];
 
-export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefresh }) {
+export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefresh, selectedModel = "gemini-1.5-flash" }) {
   const { user } = useAuth();
   const { socket } = useSocket();
   const [messages, setMessages] = useState([]);
@@ -132,6 +132,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       try {
         const newConvRes = await conversationApi.create({
           title: textToSend.slice(0, 32) || "New Conversation",
+          model: selectedModel,
         });
         convId = newConvRes.data?.conversation?._id || newConvRes.data?._id;
         if (!convId) {
@@ -166,7 +167,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
     try {
       setLoading(true);
-      const res = await messageApi.send(convId, { content: textToSend });
+      const res = await messageApi.send(convId, { content: textToSend, model: selectedModel });
       if (res && res.data) {
         // Backend returns { userMessage, assistantMessage }
         const aiReply = res.data.assistantMessage || res.data.aiMessage || res.data.reply;
@@ -316,7 +317,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
                   <div className="msg-meta">
                     <span>{new Date(msg.createdAt || Date.now()).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    {isAI && <span>• {msg.model || "Gemini 2.5 Flash"}</span>}
+                    {isAI && <span>• {msg.metadata?.model || msg.model || selectedModel}</span>}
 
                     <div style={{ display: "flex", alignItems: "center", gap: 2, marginLeft: "auto" }}>
                       <button

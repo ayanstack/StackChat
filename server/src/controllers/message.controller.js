@@ -8,7 +8,8 @@ export const sendMessage = asyncHandler(async (req, res) => {
     req.user._id,
     req.params.conversationId,
     req.body.content,
-    req.body.attachmentIds
+    req.body.attachmentIds,
+    req.body.model
   );
   new ApiResponse(
     HTTP_STATUS.CREATED,

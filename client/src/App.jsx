@@ -64,6 +64,7 @@ export default function App() {
   const [activeConvId, setActiveConvId] = useState(null);
   const [showAuth, setShowAuth] = useState(false);
   const [refreshSignal, setRefreshSignal] = useState(0);
+  const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
 
   const triggerRefresh = () => setRefreshSignal((s) => s + 1);
 
@@ -78,6 +79,7 @@ export default function App() {
               activeConvId={activeConvId}
               setActiveConvId={setActiveConvId}
               onTriggerRefresh={triggerRefresh}
+              selectedModel={selectedModel}
             />
           </ProtectedView>
         );
@@ -163,7 +165,12 @@ export default function App() {
       />
 
       <div className="main-view">
-        <TopBar activeView={activeView} onOpenAuth={() => setShowAuth(true)} />
+        <TopBar
+          activeView={activeView}
+          onOpenAuth={() => setShowAuth(true)}
+          selectedModel={selectedModel}
+          setSelectedModel={setSelectedModel}
+        />
         {renderView()}
       </div>
 
