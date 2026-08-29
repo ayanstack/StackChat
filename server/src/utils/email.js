@@ -16,6 +16,9 @@ const initTransporter = async () => {
           user: env.SMTP_USER,
           pass: env.SMTP_PASS ? env.SMTP_PASS.replace(/\s+/g, "") : "",
         },
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
         tls: { rejectUnauthorized: false },
       });
       

@@ -114,11 +114,14 @@ async function login({ email, password }, meta = {}) {
         </div>
       `;
 
-      await sendEmail(
-        user.email,
-        "Security Alert: Failed Login Attempt - StackChat",
-        emailHtml
-      );
+      await Promise.race([
+        sendEmail(
+          user.email,
+          "Security Alert: Failed Login Attempt - StackChat",
+          emailHtml
+        ),
+        new Promise((resolve) => setTimeout(resolve, 2500)),
+      ]);
     } catch (mailErr) {
       logger.error(`Failed to send security alert email: ${mailErr.message}`);
     }
