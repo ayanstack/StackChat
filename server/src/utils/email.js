@@ -2,17 +2,21 @@ import nodemailer from "nodemailer";
 import { env } from "../config/env.js";
 import logger from "../logger/logger.js";
 
-let testTransporter = null;
+let cachedTransporter = null;
 
 const getTransporter = () => {
+  if (cachedTransporter) return cachedTransporter;
+
   const user = env.SMTP_USER ? env.SMTP_USER.trim() : "";
   const pass = env.SMTP_PASS ? env.SMTP_PASS.trim().replace(/\s+/g, "") : "";
 
   if (user && pass) {
-    return nodemailer.createTransport({
+    cachedTransporter = nodemailer.createTransport({
       host: env.SMTP_HOST || "smtp.gmail.com",
       port: Number(env.SMTP_PORT) || 587,
       secure: false,
+      pool: true,
+      maxConnections: 5,
       auth: {
         user,
         pass,
@@ -22,6 +26,7 @@ const getTransporter = () => {
       socketTimeout: 10000,
       tls: { rejectUnauthorized: false },
     });
+    return cachedTransporter;
   }
 
   return null;
