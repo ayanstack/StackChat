@@ -42,11 +42,11 @@ async function validateAttachments(userId, attachmentIds) {
   return attachments;
 }
 
-async function createAssistantReply(conversation, attachments = []) {
+async function createAssistantReply(conversation, currentMessage = null) {
   try {
     const aiResult = await aiService.generateAIResponse(
       conversation,
-      attachments
+      currentMessage
     );
 
     const assistantMessage = await Message.create({
@@ -113,7 +113,7 @@ async function sendMessage(
 
   const assistantMessage = await createAssistantReply(
     conversation,
-    attachments
+    userMessage
   );
 
   return {
@@ -280,7 +280,7 @@ Previous response:
     const aiResult = await provider.generateReply({
       messages: orderedMessages,
       systemPrompt: conversation.systemPrompt,
-      model: "gemini-flash-latest",
+      model: "gemini-3.6-flash",
     });
 
     if (!aiResult || !aiResult.content) {

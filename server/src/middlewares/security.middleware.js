@@ -8,16 +8,10 @@ import ApiError from "../utils/ApiError.js";
 // Helmet: secure HTTP headers set karta hai (XSS, clickjacking se bachaata hai)
 // CSP configured to allow Google Fonts + Vite built assets
 export const helmetMiddleware = helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "ws:", "wss:"],
-    },
-  },
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+  crossOriginOpenerPolicy: false,
+  crossOriginResourcePolicy: false,
 });
 
 // CORS: sirf humara frontend hi API call kar paaye, koi aur website nahi

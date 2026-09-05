@@ -37,7 +37,7 @@ export const analyzeImage = async ({ file, imageUrl, imageBase64, mimeType, prom
   const result = await provider.generateReply({
     messages: [{ role: "user", content: userPrompt }],
     systemPrompt: "You are an expert AI vision analyst. Provide accurate, structured, and detailed observations of the provided visual data.",
-    model: "gemini-1.5-flash",
+    model: "gemini-3.6-flash",
     images,
   });
 

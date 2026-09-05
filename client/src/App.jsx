@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Layers } from "lucide-react";
 import Sidebar from "./components/Sidebar.jsx";
 import TopBar from "./components/TopBar.jsx";
@@ -62,14 +62,30 @@ export default function App() {
   const { user } = useAuth();
   const [activeView, setActiveView] = useState("chat");
   const [activeConvId, setActiveConvId] = useState(null);
-  const [showAuth, setShowAuth] = useState(false);
+  const [authModalConfig, setAuthModalConfig] = useState({ open: false, mode: "login", token: "" });
   const [refreshSignal, setRefreshSignal] = useState(0);
-  const [selectedModel, setSelectedModel] = useState("gemini-1.5-flash");
+  const [selectedModel, setSelectedModel] = useState("gemini-3.6-flash");
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const resetToken = params.get("resetToken") || params.get("token");
+    if (resetToken) {
+      setAuthModalConfig({ open: true, mode: "reset", token: resetToken });
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, newUrl);
+    }
+  }, []);
 
   const triggerRefresh = () => setRefreshSignal((s) => s + 1);
 
+  const openAuth = (mode = "login") => {
+    setAuthModalConfig({ open: true, mode, token: "" });
+  };
+
   const renderView = () => {
-    const props = { user, onOpenAuth: () => setShowAuth(true) };
+    const props = { user, onOpenAuth: () => openAuth("login") };
 
     switch (activeView) {
       case "chat":
@@ -156,25 +172,48 @@ export default function App() {
 
   return (
     <div className="app-container">
+      {/* Mobile Drawer Backdrop */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.6)",
+            backdropFilter: "blur(4px)",
+            zIndex: 35,
+          }}
+        />
+      )}
+
       <Sidebar
         activeView={activeView}
         setActiveView={setActiveView}
         activeConvId={activeConvId}
         setActiveConvId={setActiveConvId}
         refreshSignal={refreshSignal}
+        mobileOpen={mobileMenuOpen}
+        onCloseMobile={() => setMobileMenuOpen(false)}
       />
 
       <div className="main-view">
         <TopBar
           activeView={activeView}
-          onOpenAuth={() => setShowAuth(true)}
+          onOpenAuth={() => openAuth("login")}
           selectedModel={selectedModel}
           setSelectedModel={setSelectedModel}
+          onToggleMobileMenu={() => setMobileMenuOpen((prev) => !prev)}
         />
         {renderView()}
       </div>
 
-      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
+      {authModalConfig.open && (
+        <AuthModal
+          initialMode={authModalConfig.mode}
+          initialToken={authModalConfig.token}
+          onClose={() => setAuthModalConfig({ open: false, mode: "login", token: "" })}
+        />
+      )}
     </div>
   );
 }

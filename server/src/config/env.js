@@ -12,9 +12,9 @@ export const env = {
   MONGO_URI: process.env.MONGO_URI,
 
   JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
-  JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || "15m",
+  JWT_ACCESS_EXPIRY: process.env.JWT_ACCESS_EXPIRY || "7d",
   JWT_REFRESH_SECRET: process.env.JWT_REFRESH_SECRET,
-  JWT_REFRESH_EXPIRY: process.env.JWT_REFRESH_EXPIRY || "7d",
+  JWT_REFRESH_EXPIRY: process.env.JWT_REFRESH_EXPIRY || "30d",
 
   COOKIE_SECRET: process.env.COOKIE_SECRET || "dev_cookie_secret",
   BCRYPT_SALT_ROUNDS:
@@ -38,7 +38,7 @@ export const env = {
   CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
   CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
 
-  AI_PROVIDER: process.env.AI_PROVIDER || "openai",
+  AI_PROVIDER: process.env.AI_PROVIDER || "gemini",
   OPENAI_API_KEY: process.env.OPENAI_API_KEY,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   DEEPSEEK_API_KEY: process.env.DEEPSEEK_API_KEY,

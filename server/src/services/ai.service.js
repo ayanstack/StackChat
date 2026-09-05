@@ -9,7 +9,7 @@ import memoryService from "./memory.service.js";
 // GEMINI MODEL
 // ============================================================
 
-const DEFAULT_GEMINI_MODEL = "gemini-1.5-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
 
 // ============================================================
 // BUILD AI CONTEXT

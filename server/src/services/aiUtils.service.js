@@ -1,7 +1,7 @@
 import getAIProvider from "../ai/aiProvider.factory.js";
 import { env } from "../config/env.js";
 
-const MODEL = "gemini-flash-latest";
+const MODEL = "gemini-3.6-flash";
 
 async function callAI(systemPrompt, userContent) {
   const provider = getAIProvider(env.AI_PROVIDER);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Sparkles, ShieldCheck, LogIn, Activity, ChevronDown, Check, Zap, Cpu, Bot, Flame } from "lucide-react";
+import { Sparkles, ShieldCheck, LogIn, Activity, ChevronDown, Check, Zap, Cpu, Bot, Flame, Menu } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSocket } from "../context/SocketContext.jsx";
 
@@ -20,20 +20,20 @@ const VIEW_METAS = {
 
 export const AI_MODELS = [
   {
-    id: "gemini-1.5-flash",
-    name: "Gemini 1.5 Flash",
-    tag: "Fast & Light",
+    id: "gemini-3.6-flash",
+    name: "Gemini 3.6 Flash",
+    tag: "Next-Gen Flash",
     icon: Zap,
     color: "var(--accent-amber)",
-    desc: "Speed-optimized for quick Q&A and coding tasks",
+    desc: "Speed-optimized multimodal reasoning & code intelligence",
   },
   {
-    id: "gemini-1.5-pro",
-    name: "Gemini 1.5 Pro",
-    tag: "Deep Reasoning",
+    id: "gemini-flash-lite-latest",
+    name: "Gemini Flash Lite",
+    tag: "Ultra Fast",
     icon: Cpu,
     color: "var(--accent-primary)",
-    desc: "1M token context window & complex analysis",
+    desc: "Lightweight, ultra-fast responses for quick queries",
   },
   {
     id: "gpt-4o",
@@ -53,7 +53,7 @@ export const AI_MODELS = [
   },
 ];
 
-export default function TopBar({ activeView, onOpenAuth, selectedModel, setSelectedModel }) {
+export default function TopBar({ activeView, onOpenAuth, selectedModel, setSelectedModel, onToggleMobileMenu }) {
   const { user } = useAuth();
   const { connected } = useSocket();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -64,7 +64,16 @@ export default function TopBar({ activeView, onOpenAuth, selectedModel, setSelec
 
   return (
     <header className="top-bar" style={{ position: "relative", zIndex: 100 }}>
-      <div className="top-bar-title-section">
+      <div className="top-bar-title-section" style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <button
+          type="button"
+          className="btn-icon mobile-menu-btn"
+          onClick={onToggleMobileMenu}
+          title="Toggle Navigation Menu"
+          style={{ width: 32, height: 32 }}
+        >
+          <Menu size={18} />
+        </button>
         <div>
           <div className="breadcrumb-label">
             <span>{meta.title}</span>

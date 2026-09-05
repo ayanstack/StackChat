@@ -14,6 +14,7 @@ import { env } from "../config/env.js";
 import { sendEmail } from "../utils/email.js";
 import logger from "../logger/logger.js";
 import notificationService from "./notification.service.js";
+import { validateOriginalEmail } from "../utils/emailValidator.js";
 
 const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -22,7 +23,7 @@ const REFRESH_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 // =====================================================
 
 async function register({ name, email, password }, meta = {}) {
-  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedEmail = await validateOriginalEmail(email);
 
   const existingUser = await User.findOne({
     email: normalizedEmail,
@@ -42,6 +43,37 @@ async function register({ name, email, password }, meta = {}) {
 
   const tokens = await issueTokens(user, meta);
 
+  // Send welcome & account registration alert email
+  try {
+    const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const welcomeHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #4f46e5; margin-bottom: 8px;">🎉 Welcome to StackChat!</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">Account Created Successfully</p>
+        </div>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Hello <strong>${name || "there"}</strong>,</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Your StackChat account has been registered with <strong>${normalizedEmail}</strong>.</p>
+        <div style="background-color: #eff6ff; border-left: 4px solid #3b82f6; padding: 16px; margin: 20px 0; border-radius: 6px;">
+          <p style="margin: 4px 0; font-size: 14px; color: #1e40af;"><strong>Time:</strong> ${timeString}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #1e40af;"><strong>IP Address:</strong> ${meta.ip || "Unknown"}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #1e40af;"><strong>Device / Browser:</strong> ${meta.userAgent || "Unknown"}</p>
+        </div>
+        <p style="color: #6b7280; font-size: 14px; line-height: 1.5;">You can now access AI chat, vision analysis, places discovery, research tools, and more.</p>
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">— StackChat Security Team</p>
+      </div>
+    `;
+
+    sendEmail(
+      normalizedEmail,
+      "Welcome to StackChat — Account Created Successfully",
+      welcomeHtml
+    ).catch((err) => logger.error(`Failed to send welcome email: ${err.message}`));
+  } catch (err) {
+    logger.error(`Error sending welcome notification: ${err.message}`);
+  }
+
   return {
     user: user.toSafeObject(),
     ...tokens,
@@ -53,7 +85,7 @@ async function register({ name, email, password }, meta = {}) {
 // =====================================================
 
 async function login({ email, password }, meta = {}) {
-  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedEmail = await validateOriginalEmail(email);
 
   const user = await User.findOne({
     email: normalizedEmail,
@@ -81,13 +113,13 @@ async function login({ email, password }, meta = {}) {
         </div>
       `;
 
-      await sendEmail(
+      sendEmail(
         normalizedEmail,
         "Security Alert: Login Attempt - StackChat",
         emailHtml
-      );
+      ).catch((mailErr) => logger.warn(`[Login Alert] Failed to send email: ${mailErr.message}`));
     } catch (mailErr) {
-      logger.error(`Failed to send security alert email for unregistered user: ${mailErr.message}`);
+      logger.error(`Failed to initiate security alert email for unregistered user: ${mailErr.message}`);
     }
 
     throw ApiError.unauthorized("Invalid email or password");
@@ -110,18 +142,18 @@ async function login({ email, password }, meta = {}) {
     await user.comparePassword(password);
 
   if (!isPasswordCorrect) {
-    // 1. Create in-app notification for the user
+    // 1. Create in-app notification for the user (non-blocking)
     try {
-      await notificationService.createNotification(user._id, {
+      notificationService.createNotification(user._id, {
         title: "Security Alert: Failed Login Attempt",
         message: `An unsuccessful login attempt was detected on your account from IP ${meta.ip || "unknown"}.`,
         type: "warning",
-      });
+      }).catch((notifErr) => logger.warn(`[Notification] Failed: ${notifErr.message}`));
     } catch (notifErr) {
       logger.error(`Failed to create in-app notification on failed login: ${notifErr.message}`);
     }
 
-    // 2. Send security alert email to user's Gmail (Awaited to guarantee delivery)
+    // 2. Send security alert email to user's Gmail (non-blocking so response is returned immediately)
     try {
       const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
       const emailHtml = `
@@ -144,11 +176,11 @@ async function login({ email, password }, meta = {}) {
         </div>
       `;
 
-      await sendEmail(
+      sendEmail(
         user.email,
         "Security Alert: Failed Login Attempt - StackChat",
         emailHtml
-      );
+      ).catch((mailErr) => logger.warn(`[Alert Email] ${mailErr.message}`));
     } catch (mailErr) {
       logger.error(`Failed to send security alert email: ${mailErr.message}`);
     }
@@ -159,6 +191,37 @@ async function login({ email, password }, meta = {}) {
   }
 
   const tokens = await issueTokens(user, meta);
+
+  // Send successful login security alert email to user's real email
+  try {
+    const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #4f46e5; margin-bottom: 8px;">🔐 Security Alert: Successful Sign-in</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">StackChat Account Protection</p>
+        </div>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Hello <strong>${user.name || "User"}</strong>,</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">We detected a successful sign-in to your StackChat account.</p>
+        <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 6px;">
+          <p style="margin: 4px 0; font-size: 14px; color: #166534;"><strong>Time:</strong> ${timeString}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #166534;"><strong>IP Address:</strong> ${meta.ip || "Unknown"}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #166534;"><strong>Device / Browser:</strong> ${meta.userAgent || "Unknown"}</p>
+        </div>
+        <p style="color: #6b7280; font-size: 14px; line-height: 1.5;">If this was you, no action is needed. If you did not sign in, please reset your password immediately to secure your account.</p>
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">— StackChat Security Team</p>
+      </div>
+    `;
+
+    sendEmail(
+      user.email,
+      "Security Alert: New Sign-in to StackChat",
+      emailHtml
+    ).catch((err) => logger.error(`Failed to send login alert: ${err.message}`));
+  } catch (alertErr) {
+    logger.error(`Error initiating login alert email: ${alertErr.message}`);
+  }
 
   return {
     user: user.toSafeObject(),
@@ -180,7 +243,7 @@ async function googleLogin(
     );
   }
 
-  const normalizedEmail = email.toLowerCase().trim();
+  const normalizedEmail = await validateOriginalEmail(email);
 
   let user = await User.findOne({
     $or: [
@@ -208,7 +271,9 @@ async function googleLogin(
       };
     }
 
-    user.isEmailVerified = true;
+    if (!user.isEmailVerified) {
+      user.isEmailVerified = true;
+    }
 
     await user.save();
   }
@@ -228,6 +293,35 @@ async function googleLogin(
   }
 
   const tokens = await issueTokens(user, meta);
+
+  // Send Google sign-in security alert email
+  try {
+    const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #4f46e5; margin-bottom: 8px;">🔐 Security Alert: Google Sign-in</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">StackChat Account Protection</p>
+        </div>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Hello <strong>${user.name || "User"}</strong>,</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">We detected a sign-in to your StackChat account via Google OAuth.</p>
+        <div style="background-color: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px; margin: 20px 0; border-radius: 6px;">
+          <p style="margin: 4px 0; font-size: 14px; color: #166534;"><strong>Time:</strong> ${timeString}</p>
+          <p style="margin: 4px 0; font-size: 14px; color: #166534;"><strong>IP Address:</strong> ${meta.ip || "Unknown"}</p>
+        </div>
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">— StackChat Security Team</p>
+      </div>
+    `;
+
+    sendEmail(
+      user.email,
+      "Security Alert: Google Sign-in - StackChat",
+      emailHtml
+    ).catch((err) => logger.error(`Failed to send Google login alert: ${err.message}`));
+  } catch (err) {
+    logger.error(`Error sending Google login alert notification: ${err.message}`);
+  }
 
   return {
     user: user.toSafeObject(),
@@ -323,215 +417,133 @@ async function logout(incomingToken) {
 
 async function forgotPassword(email) {
   if (!email || typeof email !== "string") {
-    throw ApiError.badRequest(
-      "Email is required"
-    );
+    throw ApiError.badRequest("Email is required");
   }
 
-  const normalizedEmail =
-    email.toLowerCase().trim();
-
-  console.log(
-    "========================================"
-  );
-
-  console.log(
-    "🔐 FORGOT PASSWORD REQUEST"
-  );
-
-  console.log(
-    "Email:",
-    normalizedEmail
-  );
+  const normalizedEmail = await validateOriginalEmail(email);
 
   const user = await User.findOne({
     email: normalizedEmail,
     isDeleted: false,
   });
 
-  // Security:
-  // Never reveal whether an email exists.
   if (!user) {
-    console.log(
-      "⚠️ No active user found for this email"
-    );
-
-    console.log(
-      "========================================"
-    );
-
     return {
-      message:
-        "If that email exists, a reset link has been sent.",
+      message: "If that email exists, a reset code and link have been sent to your email.",
     };
   }
 
-  console.log(
-    "✅ User found:",
-    user._id.toString()
-  );
+  // Method 1: Generate 32-byte secure token for direct URL
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
 
-  // Generate raw token
-  const rawToken =
-    crypto.randomBytes(32).toString("hex");
-
-  // Hash token before saving
-  const hashedToken =
-    crypto
-      .createHash("sha256")
-      .update(rawToken)
-      .digest("hex");
+  // Method 2: Generate 6-digit OTP code for instant manual entry
+  const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedOtp = crypto.createHash("sha256").update(otpCode).digest("hex");
 
   user.passwordResetToken = hashedToken;
+  user.passwordResetOtp = hashedOtp;
+  user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 mins
 
-  // 15 minute expiry
-  user.passwordResetExpires = new Date(
-    Date.now() + 15 * 60 * 1000
-  );
+  await user.save({ validateBeforeSave: false });
 
-  await user.save({
-    validateBeforeSave: false,
-  });
+  const clientBase = env.CLIENT_URL || "http://localhost:5000";
+  const resetUrl = `${clientBase}/?resetToken=${rawToken}`;
+  const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
 
-  console.log(
-    "✅ Password reset token saved"
-  );
-
-  console.log(
-    "Token expires:",
-    user.passwordResetExpires
-  );
-
-  // Create reset URL
-  const resetUrl =
-    `${env.CLIENT_URL}/reset-password?token=${rawToken}`;
-
-  console.log(
-    "🔗 Reset URL:",
-    resetUrl
-  );
-
-  // Email HTML
   const html = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Password Reset - StackChat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset Your StackChat Password</title>
 </head>
+<body style="margin: 0; padding: 32px 16px; background-color: #0b0f19; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #e2e8f0;">
+  <div style="max-width: 520px; margin: 0 auto; background-color: #111827; border-radius: 16px; overflow: hidden; border: 1px solid #1f2937; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);">
+    
+    <!-- Brand Header -->
+    <div style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); padding: 32px 24px; text-align: center; border-bottom: 1px solid #3730a3;">
+      <div style="display: inline-block; background-color: #4f46e5; width: 48px; height: 48px; line-height: 48px; border-radius: 12px; margin-bottom: 12px; font-size: 24px; text-align: center;">
+        🔐
+      </div>
+      <h1 style="color: #ffffff; margin: 0 0 6px 0; font-size: 22px; font-weight: 700; letter-spacing: -0.02em;">Password Reset Request</h1>
+      <p style="color: #c7d2fe; margin: 0; font-size: 14px;">StackChat Account Protection</p>
+    </div>
 
-<body style="
-  margin:0;
-  padding:30px;
-  background:#f5f5f5;
-  font-family:Arial,sans-serif;
-">
+    <!-- Body -->
+    <div style="padding: 28px 24px;">
+      <p style="color: #f3f4f6; font-size: 15px; line-height: 1.6; margin: 0 0 16px 0;">
+        Hello <strong>${user.name || "User"}</strong>,
+      </p>
+      <p style="color: #94a3b8; font-size: 14px; line-height: 1.6; margin: 0 0 24px 0;">
+        We received a request to reset the password for your StackChat account (<strong>${normalizedEmail}</strong>). Choose either method below to reset your password:
+      </p>
 
-  <div style="
-    max-width:600px;
-    margin:auto;
-    background:#ffffff;
-    padding:30px;
-    border-radius:10px;
-  ">
+      <!-- Method 1: 6-Digit Code -->
+      <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 20px; text-align: center; margin-bottom: 24px;">
+        <span style="display: block; color: #a5b4fc; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px;">
+          Method 1: Enter this 6-Digit Reset Code
+        </span>
+        <div style="font-family: 'JetBrains Mono', 'Courier New', monospace; font-size: 36px; font-weight: 800; letter-spacing: 8px; color: #818cf8; margin: 8px 0;">
+          ${otpCode}
+        </div>
+        <p style="color: #64748b; font-size: 12px; margin: 6px 0 0 0;">Valid for 15 minutes • Single use only</p>
+      </div>
 
-    <h2>Password Reset Request</h2>
+      <!-- Method 2: Direct Reset Link -->
+      <div style="text-align: center; margin-bottom: 28px;">
+        <span style="display: block; color: #a5b4fc; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px;">
+          Method 2: Or Click Below to Reset Instantly
+        </span>
+        <a href="${resetUrl}" style="display: inline-block; background-color: #4f46e5; color: #ffffff; text-decoration: none; font-size: 15px; font-weight: 600; padding: 12px 32px; border-radius: 8px; box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);">
+          Reset Password
+        </a>
+      </div>
 
-    <p>
-      Hello ${user.name || "User"},
-    </p>
+      <!-- Warning Box -->
+      <div style="background-color: #2e1065; border-left: 4px solid #a855f7; border-radius: 6px; padding: 14px; margin-bottom: 20px;">
+        <p style="color: #e9d5ff; font-size: 13px; line-height: 1.5; margin: 0;">
+          <strong>⚠️ Did not request this?</strong> If you did not make this request, someone else may have typed your email. You can safely ignore this email; your account remains secure.
+        </p>
+      </div>
 
-    <p>
-      You requested to reset your StackChat password.
-    </p>
+      <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin: 0; text-align: center;">
+        Requested on: ${timeString}
+      </p>
+    </div>
 
-    <p>
-      Click the button below to create a new password:
-    </p>
-
-    <p>
-      <a
-        href="${resetUrl}"
-        style="
-          display:inline-block;
-          padding:12px 20px;
-          background:#000000;
-          color:#ffffff;
-          text-decoration:none;
-          border-radius:6px;
-        "
-      >
-        Reset Password
-      </a>
-    </p>
-
-    <p>
-      This password reset link will expire in
-      <strong>15 minutes</strong>.
-    </p>
-
-    <p>
-      If you did not request a password reset,
-      you can safely ignore this email.
-    </p>
-
-    <hr />
-
-    <p>
-      <strong>StackChat</strong>
-    </p>
+    <!-- Footer -->
+    <div style="background-color: #0f172a; padding: 18px 24px; text-align: center; border-top: 1px solid #1e293b;">
+      <p style="color: #64748b; font-size: 12px; margin: 0;">
+        © StackChat AI Workspace. All rights reserved.
+      </p>
+    </div>
 
   </div>
-
 </body>
 </html>
-`;
-
-  console.log(
-    "📧 Calling sendEmail()..."
-  );
+  `;
 
   const emailSent = await sendEmail(
     user.email,
-    "Password Reset - StackChat",
+    `🔐 ${otpCode} is your StackChat password reset code`,
     html
   );
 
-  console.log(
-    "📧 Email result:",
-    emailSent
-  );
-
-  // Email failed
   if (!emailSent) {
-    console.log(
-      "❌ Password reset email failed"
-    );
-
-    // Remove reset token
     user.passwordResetToken = undefined;
+    user.passwordResetOtp = undefined;
     user.passwordResetExpires = undefined;
-
-    await user.save({
-      validateBeforeSave: false,
-    });
+    await user.save({ validateBeforeSave: false });
 
     throw ApiError.internal(
       "Failed to send password reset email. Please check server email configuration."
     );
   }
 
-  console.log(
-    "✅ PASSWORD RESET EMAIL SENT SUCCESSFULLY"
-  );
-
-  console.log(
-    "========================================"
-  );
-
   return {
-    message:
-      "If that email exists, a reset link has been sent.",
+    message: "A 6-digit reset code and link have been sent to your email.",
   };
 }
 
@@ -539,65 +551,76 @@ async function forgotPassword(email) {
 // RESET PASSWORD
 // =====================================================
 
-async function resetPassword(
-  rawToken,
-  newPassword
-) {
-  if (!rawToken) {
-    throw ApiError.badRequest(
-      "Reset token is required"
-    );
+async function resetPassword(tokenOrOtp, newPassword) {
+  if (!tokenOrOtp) {
+    throw ApiError.badRequest("Reset code or token is required");
   }
 
-  if (!newPassword) {
-    throw ApiError.badRequest(
-      "New password is required"
-    );
+  if (!newPassword || newPassword.length < 8) {
+    throw ApiError.badRequest("New password must be at least 8 characters");
   }
 
-  const hashedToken =
-    crypto
-      .createHash("sha256")
-      .update(rawToken)
-      .digest("hex");
+  const cleanInput = tokenOrOtp.toString().trim();
+  const hashedInput = crypto
+    .createHash("sha256")
+    .update(cleanInput)
+    .digest("hex");
 
   const user = await User.findOne({
-    passwordResetToken: hashedToken,
-
-    passwordResetExpires: {
-      $gt: new Date(),
-    },
-
+    $or: [
+      { passwordResetToken: hashedInput },
+      { passwordResetOtp: hashedInput },
+    ],
+    passwordResetExpires: { $gt: new Date() },
     isDeleted: false,
-  }).select("+passwordResetToken +passwordResetExpires");
+  }).select("+passwordResetToken +passwordResetOtp +passwordResetExpires");
 
   if (!user) {
     throw ApiError.badRequest(
-      "Reset token is invalid or has expired"
+      "Reset code or link is invalid or has expired. Please request a new one."
     );
   }
 
   user.password = newPassword;
-
   user.passwordResetToken = undefined;
-
+  user.passwordResetOtp = undefined;
   user.passwordResetExpires = undefined;
-
   await user.save();
 
   // Revoke all existing refresh tokens
   await RefreshToken.updateMany(
-    {
-      user: user._id,
-    },
-    {
-      isRevoked: true,
-    }
+    { user: user._id },
+    { isRevoked: true }
   );
 
+  // Send confirmation alert email
+  try {
+    const timeString = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const successHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e5e7eb; border-radius: 12px; background-color: #ffffff;">
+        <div style="text-align: center; margin-bottom: 20px;">
+          <h2 style="color: #16a34a; margin-bottom: 8px;">✅ Password Changed Successfully</h2>
+          <p style="color: #6b7280; font-size: 14px; margin: 0;">StackChat Account Security</p>
+        </div>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Hello <strong>${user.name || "User"}</strong>,</p>
+        <p style="color: #374151; font-size: 15px; line-height: 1.5;">Your StackChat password was successfully reset on <strong>${timeString}</strong>.</p>
+        <p style="color: #dc2626; font-size: 14px; line-height: 1.5; font-weight: bold;">If you did not perform this change, please contact support or reset your password immediately.</p>
+        <hr style="border: 0; border-top: 1px solid #e5e7eb; margin: 24px 0;" />
+        <p style="color: #9ca3af; font-size: 12px; text-align: center; margin: 0;">— StackChat Security Team</p>
+      </div>
+    `;
+
+    sendEmail(
+      user.email,
+      "Security Alert: Password Changed Successfully - StackChat",
+      successHtml
+    ).catch((err) => logger.error(`Failed to send password change confirmation: ${err.message}`));
+  } catch (err) {
+    logger.error(`Error sending password change confirmation: ${err.message}`);
+  }
+
   return {
-    message:
-      "Password has been reset successfully",
+    message: "Password has been reset successfully. You can now sign in with your new password.",
   };
 }
 

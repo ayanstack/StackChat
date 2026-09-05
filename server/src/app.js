@@ -38,6 +38,8 @@ import placesRoutes from "./routes/places.routes.js";
 import voiceRoutes from "./routes/voice.routes.js";
 import researchRoutes from "./routes/research.routes.js";
 import integrationsRoutes from "./routes/integrations.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
+import reportRoutes from "./routes/report.routes.js";
 
 import { env } from "./config/env.js";
 
@@ -114,6 +116,8 @@ app.use(`${API_BASE}/places`, placesRoutes);
 app.use(`${API_BASE}/voice`, voiceRoutes);
 app.use(`${API_BASE}/research`, researchRoutes);
 app.use(`${API_BASE}/integrations`, integrationsRoutes);
+app.use(`${API_BASE}/admin`, adminRoutes);
+app.use(`${API_BASE}/reports`, reportRoutes);
 
 // ──────────────────────────────────────────────────────────
 // 5. SPA FALLBACK — only for browser navigation routes,

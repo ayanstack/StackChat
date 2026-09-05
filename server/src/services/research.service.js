@@ -45,7 +45,7 @@ Be thorough, precise, and objective.`;
   const result = await provider.generateReply({
     messages: [{ role: "user", content: prompt }],
     systemPrompt: "You are an elite research scientist and senior strategic analyst. Provide rigorous, structured, and citation-backed research analyses.",
-    model: "gemini-1.5-flash",
+    model: "gemini-3.6-flash",
   });
 
   return {

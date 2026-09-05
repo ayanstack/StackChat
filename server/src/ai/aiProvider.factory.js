@@ -7,7 +7,7 @@ const providers = {
 };
 
 function getAIProvider(providerName) {
-  const provider = providers[providerName];
+  const provider = providers[providerName] || providers[AI_PROVIDERS.GEMINI];
 
   if (!provider) {
     throw ApiError.badRequest(

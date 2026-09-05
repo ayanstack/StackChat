@@ -2,17 +2,32 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 const API_BASE = `${BACKEND_URL}/api/v1`;
 
 let accessToken = localStorage.getItem("stackchat_token") || "";
+let refreshToken = localStorage.getItem("stackchat_refresh_token") || "";
 
-export const setAuthToken = (token) => {
-  accessToken = token;
+export const setAuthToken = (token, refToken = null) => {
+  accessToken = token || "";
   if (token) {
     localStorage.setItem("stackchat_token", token);
   } else {
     localStorage.removeItem("stackchat_token");
   }
+
+  if (refToken !== null) {
+    refreshToken = refToken || "";
+    if (refToken) {
+      localStorage.setItem("stackchat_refresh_token", refToken);
+    } else {
+      localStorage.removeItem("stackchat_refresh_token");
+    }
+  }
 };
 
 export const getAuthToken = () => accessToken;
+export const getRefreshToken = () => refreshToken;
+
+export const pingServer = () => {
+  return fetch(`${BACKEND_URL}/health`).catch(() => {});
+};
 
 async function request(endpoint, options = {}) {
   const url = `${API_BASE}${endpoint}`;
@@ -30,10 +45,39 @@ async function request(endpoint, options = {}) {
   }
 
   try {
-    const response = await fetch(url, {
+    let response = await fetch(url, {
       ...options,
       headers,
     });
+
+    // If access token expired (401) and we have a refreshToken, attempt transparent token refresh
+    if (response.status === 401 && refreshToken && !endpoint.includes("/auth/login") && !endpoint.includes("/auth/refresh-token")) {
+      try {
+        const refreshResp = await fetch(`${API_BASE}/auth/refresh-token`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ refreshToken }),
+        });
+
+        if (refreshResp.ok) {
+          const refreshData = await refreshResp.json();
+          const newAccessToken = refreshData.data?.accessToken;
+          const newRefreshToken = refreshData.data?.refreshToken;
+
+          if (newAccessToken) {
+            setAuthToken(newAccessToken, newRefreshToken || refreshToken);
+            headers.Authorization = `Bearer ${newAccessToken}`;
+            // Retry the original request with new token
+            response = await fetch(url, {
+              ...options,
+              headers,
+            });
+          }
+        }
+      } catch (refreshErr) {
+        console.warn("[Auth] Automatic session renewal failed:", refreshErr.message);
+      }
+    }
 
     const data = await response.json().catch(() => ({}));
 
@@ -57,6 +101,7 @@ async function request(endpoint, options = {}) {
 export const authApi = {
   register: (payload) => request("/auth/register", { method: "POST", body: JSON.stringify(payload) }),
   login: (payload) => request("/auth/login", { method: "POST", body: JSON.stringify(payload) }),
+  refreshToken: (token) => request("/auth/refresh-token", { method: "POST", body: JSON.stringify({ refreshToken: token }) }),
   forgotPassword: (email) => request("/auth/forgot-password", { method: "POST", body: JSON.stringify({ email }) }),
   resetPassword: (payload) => request("/auth/reset-password", { method: "POST", body: JSON.stringify(payload) }),
   logout: () => request("/auth/logout", { method: "POST" }),

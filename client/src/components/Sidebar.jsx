@@ -60,6 +60,8 @@ export default function Sidebar({
   activeConvId,
   setActiveConvId,
   refreshSignal,
+  mobileOpen = false,
+  onCloseMobile,
 }) {
   const { user, logout } = useAuth();
   const [conversations, setConversations] = useState([]);
@@ -85,6 +87,7 @@ export default function Sidebar({
   const handleNewChat = async () => {
     if (!user) {
       setActiveView("chat");
+      onCloseMobile?.();
       return;
     }
     try {
@@ -93,6 +96,7 @@ export default function Sidebar({
       setConversations((prev) => [newConv, ...prev]);
       setActiveConvId(newConv._id);
       setActiveView("chat");
+      onCloseMobile?.();
     } catch (err) {
       console.error("Failed to create conversation:", err);
     }
@@ -116,7 +120,7 @@ export default function Sidebar({
   );
 
   return (
-    <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
+    <aside className={`sidebar ${collapsed ? "collapsed" : ""} ${mobileOpen ? "mobile-open" : ""}`}>
       {/* Brand Header */}
       <div className="sidebar-header">
         {!collapsed && (
@@ -173,7 +177,10 @@ export default function Sidebar({
                   <button
                     key={item.id}
                     className={`nav-item-btn ${isActive ? "active" : ""}`}
-                    onClick={() => setActiveView(item.id)}
+                    onClick={() => {
+                      setActiveView(item.id);
+                      onCloseMobile?.();
+                    }}
                     title={collapsed ? item.label : ""}
                     style={{ justifyContent: collapsed ? "center" : "flex-start" }}
                   >
@@ -235,6 +242,7 @@ export default function Sidebar({
                     onClick={() => {
                       setActiveConvId(conv._id);
                       setActiveView("chat");
+                      onCloseMobile?.();
                     }}
                   >
                     <div style={{ display: "flex", alignItems: "center", gap: 8, overflow: "hidden", flex: 1 }}>

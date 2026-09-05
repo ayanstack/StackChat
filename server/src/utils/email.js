@@ -3,6 +3,7 @@ import { env } from "../config/env.js";
 import logger from "../logger/logger.js";
 
 let cachedTransporter = null;
+let testTransporter = null;
 
 const getTransporter = () => {
   if (cachedTransporter) return cachedTransporter;
