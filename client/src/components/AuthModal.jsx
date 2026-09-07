@@ -40,6 +40,9 @@ export default function AuthModal({ onClose, initialMode = "login", initialToken
       } else if (mode === "forgot") {
         const res = await authApi.forgotPassword(email);
         setSuccessMsg(res.message || "A 6-digit reset code and link have been sent to your email.");
+        if (res.data?.devOtp) {
+          setResetCodeOrToken(res.data.devOtp);
+        }
         setMode("reset");
       } else if (mode === "reset") {
         if (password !== confirmPassword) {

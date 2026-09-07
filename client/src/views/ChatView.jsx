@@ -18,6 +18,7 @@ import {
   X,
   FileText,
   ExternalLink,
+  Loader,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSocket } from "../context/SocketContext.jsx";
@@ -593,18 +594,37 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
             );
           })}
 
-          {/* Real-time Streaming State */}
-          {isStreaming && (
-            <div className="message-item ai-message">
-              <div className="msg-avatar ai">
+          {/* Real-time Streaming & Thinking Loader State */}
+          {(loading || isStreaming) && (
+            <div className="message-item ai-message" style={{ animation: "messageAppear 0.2s ease-out" }}>
+              <div className="msg-avatar ai" style={{ position: "relative" }}>
                 <Bot size={15} />
+                <span
+                  style={{
+                    position: "absolute",
+                    inset: -2,
+                    borderRadius: "var(--radius-sm)",
+                    border: "1.5px solid var(--accent-primary)",
+                    opacity: 0.7,
+                    animation: "pulseGlow 1.5s infinite ease-in-out",
+                  }}
+                />
               </div>
               <div className="msg-body-wrapper">
                 <div className="msg-bubble">
-                  <div style={{ whiteSpace: "pre-wrap" }}>
-                    {streamingContent}
-                    <span className="streaming-cursor"></span>
-                  </div>
+                  {streamingContent ? (
+                    <div>
+                      {renderBubbleContent(streamingContent)}
+                      <span className="streaming-cursor"></span>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "2px 0", color: "var(--text-secondary)" }}>
+                      <Loader size={15} className="spin" color="var(--accent-primary)" />
+                      <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "var(--text-primary)" }}>
+                        {isWebSearchEnabled ? "Searching web & synthesizing answer..." : "Thinking & generating response..."}
+                      </span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -724,9 +744,13 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
                 className="btn btn-primary"
                 onClick={() => handleSendMessage()}
                 disabled={(!input.trim() && attachments.length === 0) || loading || isStreaming}
-                style={{ width: 28, height: 28, padding: 0, borderRadius: "var(--radius-sm)" }}
+                style={{ width: 28, height: 28, padding: 0, borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center" }}
               >
-                <ArrowUp size={14} />
+                {loading || isStreaming ? (
+                  <Loader size={14} className="spin" />
+                ) : (
+                  <ArrowUp size={14} />
+                )}
               </button>
             </div>
           </div>

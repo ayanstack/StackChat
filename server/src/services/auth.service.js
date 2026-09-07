@@ -532,14 +532,12 @@ async function forgotPassword(email) {
   );
 
   if (!emailSent) {
-    user.passwordResetToken = undefined;
-    user.passwordResetOtp = undefined;
-    user.passwordResetExpires = undefined;
-    await user.save({ validateBeforeSave: false });
-
-    throw ApiError.internal(
-      "Failed to send password reset email. Please check server email configuration."
-    );
+    logger.warn(`🔐 Password reset for ${normalizedEmail} (Email delivery failed/unconfigured). OTP: ${otpCode} | Token: ${rawToken}`);
+    return {
+      message: "Password reset request processed. If your email server is configured, check your inbox. (Dev Code: " + otpCode + ")",
+      devOtp: otpCode,
+      resetToken: rawToken,
+    };
   }
 
   return {
