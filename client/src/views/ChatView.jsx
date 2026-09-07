@@ -170,7 +170,8 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
   const { socket } = useSocket();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(false);
+  const [isThinking, setIsThinking] = useState(false);
   const [streamingContent, setStreamingContent] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
@@ -195,7 +196,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
     const fetchMessages = async () => {
       try {
-        setLoading(true);
+        setInitialLoading(true);
         const res = await messageApi.listByConversation(activeConvId);
         if (res && res.data) {
           setMessages(res.data.messages || res.data || []);
@@ -203,7 +204,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       } catch (err) {
         console.error("Failed to load messages:", err);
       } finally {
-        setLoading(false);
+        setInitialLoading(false);
       }
     };
 
@@ -229,15 +230,15 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     };
 
     const handleChunk = (data) => {
+      setIsThinking(false);
       setIsStreaming(true);
-      setLoading(false);
       setStreamingContent((prev) => prev + (data.chunk || data.text || ""));
       scrollToBottom();
     };
 
     const handleComplete = (data) => {
+      setIsThinking(false);
       setIsStreaming(false);
-      setLoading(false);
       setStreamingContent("");
       // Server emits { assistantMessage } — add it to the list
       const aiMsg = data?.assistantMessage || data?.message;
@@ -249,8 +250,8 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     };
 
     const handleError = (data) => {
+      setIsThinking(false);
       setIsStreaming(false);
-      setLoading(false);
       setStreamingContent("");
       console.error("Socket error during generation:", data);
     };
@@ -359,7 +360,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
   const handleSendMessage = async (customPrompt) => {
     const textToSend = typeof customPrompt === "string" ? customPrompt : input.trim();
-    if (!textToSend || loading || isStreaming) return;
+    if (!textToSend || isThinking || isStreaming) return;
 
     let convId = activeConvId;
 
@@ -402,7 +403,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       createdAt: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
-    setLoading(true);
+    setIsThinking(true);
     setIsStreaming(true);
     setStreamingContent("");
     scrollToBottom();
@@ -422,7 +423,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
     // Fallback: HTTP request if socket not available
     try {
-      setLoading(true);
+      setIsThinking(true);
       setIsStreaming(true);
       const res = await messageApi.send(convId, {
         content: textToSend,
@@ -444,7 +445,9 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     } catch (err) {
       console.error("Failed to send message:", err);
     } finally {
-      setLoading(false);
+      setIsThinking(false);
+      setIsStreaming(false);
+      setStreamingContent("");
     }
   };
 
@@ -456,7 +459,9 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
   const handleRegenerate = async (msgId) => {
     try {
-      setLoading(true);
+      setIsThinking(true);
+      setIsStreaming(true);
+      setStreamingContent("");
       const res = await messageApi.regenerate(msgId);
       if (res && res.data) {
         setMessages((prev) => prev.map((m) => (m._id === msgId ? res.data : m)));
@@ -464,7 +469,9 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     } catch (err) {
       console.error("Failed to regenerate:", err);
     } finally {
-      setLoading(false);
+      setIsThinking(false);
+      setIsStreaming(false);
+      setStreamingContent("");
     }
   };
 
@@ -488,7 +495,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       {/* Scrollable Messages Feed */}
       <div className="chat-scroll-area">
         <div className="chat-message-feed">
-          {messages.length === 0 && !loading && (
+          {messages.length === 0 && !initialLoading && (
             <div style={{ textAlign: "center", margin: "auto", padding: "60px 20px 20px", maxWidth: 640 }}>
               <div
                 className="brand-glyph"
@@ -497,72 +504,70 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
                   height: 44,
                   margin: "0 auto 16px",
                   borderRadius: "var(--radius-lg)",
+                  fontSize: "1.2rem",
+                  boxShadow: "0 0 20px rgba(99, 102, 241, 0.25)",
                 }}
               >
-                <Sparkles size={22} />
+                ⚡
               </div>
-
-              <h2 style={{ fontSize: "1.35rem", fontWeight: 700, letterSpacing: "-0.02em", color: "var(--text-primary)" }}>
-                How can StackChat assist you?
+              <h2 style={{ fontSize: "1.25rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: 8 }}>
+                How can I help you today?
               </h2>
-              <p style={{ fontSize: "0.85rem", color: "var(--text-muted)", marginTop: 6, lineHeight: 1.6 }}>
-                Synthesize research, parse complex CSV tables, execute developer utilities, or tap into cross-conversation memory.
+              <p style={{ fontSize: "0.88rem", color: "var(--text-secondary)", marginBottom: 24, lineHeight: 1.5 }}>
+                StackChat AI assistant is ready. Ask a question, generate images, analyze CSV datasets, or brainstorm code.
               </p>
 
-              {/* Quick Starter Chips */}
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
                   gap: 10,
-                  marginTop: 28,
                   textAlign: "left",
                 }}
               >
-                {QUICK_STARTERS.map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <button
-                      key={idx}
-                      onClick={() => handleSendMessage(item.prompt)}
-                      className="card"
-                      style={{
-                        padding: "12px 14px",
-                        cursor: "pointer",
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: 4,
-                        textAlign: "left",
-                        background: "var(--bg-surface)",
-                        border: "1px solid var(--border-hairline)",
-                      }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <Icon size={14} color={item.color} />
-                        <span style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--text-primary)" }}>
-                          {item.title}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
-                        {item.prompt}
-                      </div>
-                    </button>
-                  );
-                })}
+                {[
+                  { title: "Generate an Image", prompt: "Draw a futuristic cyberpunk city with flying cars in 4K" },
+                  { title: "Debug JavaScript", prompt: "How do I optimize React re-renders with useMemo and useCallback?" },
+                  { title: "Write a SQL query", prompt: "Write a SQL query to find top 5 customers with highest revenue this month" },
+                  { title: "Explore Capabilities", prompt: "What capabilities and AI models do you support?" },
+                ].map((item, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    className="card card-hover"
+                    style={{
+                      padding: "12px 14px",
+                      cursor: "pointer",
+                      background: "var(--bg-surface-elevated)",
+                      border: "1px solid var(--border-hairline)",
+                      borderRadius: "var(--radius-md)",
+                      textAlign: "left",
+                    }}
+                    onClick={() => handleSendMessage(item.prompt)}
+                  >
+                    <div style={{ fontSize: "0.82rem", fontWeight: 600, color: "var(--text-primary)", marginBottom: 4 }}>
+                      {item.title}
+                    </div>
+                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", lineHeight: 1.4 }}>
+                      {item.prompt}
+                    </div>
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
-          {/* Rendered Messages */}
           {messages.map((msg) => {
-            const isAI = msg.role === "assistant" || msg.role === "system";
+            const isUser = msg.role === "user";
+            const isAI = msg.role === "assistant";
+
             return (
               <div
                 key={msg._id}
-                className={`message-item ${isAI ? "ai-message" : "user-message"}`}
+                className={`message-item ${isUser ? "user-message" : "ai-message"}`}
               >
-                <div className={`msg-avatar ${isAI ? "ai" : "user"}`}>
-                  {isAI ? <Bot size={15} /> : <UserIcon size={15} />}
+                <div className={`msg-avatar ${isUser ? "user" : "ai"}`}>
+                  {isUser ? <User size={15} /> : <Bot size={15} />}
                 </div>
 
                 <div className="msg-body-wrapper">
@@ -611,16 +616,16 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
           })}
 
           {/* Real-time Streaming & Thinking Loader State */}
-          {(loading || isStreaming) && (
+          {(isThinking || isStreaming) && (
             <div className="message-item ai-message" style={{ animation: "messageAppear 0.2s ease-out" }}>
               <div className="msg-avatar ai" style={{ position: "relative" }}>
                 <Bot size={15} />
                 <span
                   style={{
                     position: "absolute",
-                    inset: -2,
+                    inset: -3,
                     borderRadius: "var(--radius-sm)",
-                    border: "1.5px solid var(--accent-primary)",
+                    border: "2px solid var(--accent-primary)",
                     opacity: 0.85,
                     animation: "pulseGlow 1.2s infinite ease-in-out",
                   }}
@@ -764,10 +769,10 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
                 type="button"
                 className="btn btn-primary"
                 onClick={() => handleSendMessage()}
-                disabled={(!input.trim() && attachments.length === 0) || loading || isStreaming}
+                disabled={(!input.trim() && attachments.length === 0) || isThinking || isStreaming}
                 style={{ width: 28, height: 28, padding: 0, borderRadius: "var(--radius-sm)", display: "flex", alignItems: "center", justifyContent: "center" }}
               >
-                {loading || isStreaming ? (
+                {isThinking || isStreaming ? (
                   <Loader size={14} className="spin" />
                 ) : (
                   <ArrowUp size={14} />
