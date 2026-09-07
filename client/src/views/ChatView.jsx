@@ -230,12 +230,14 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
     const handleChunk = (data) => {
       setIsStreaming(true);
+      setLoading(false);
       setStreamingContent((prev) => prev + (data.chunk || data.text || ""));
       scrollToBottom();
     };
 
     const handleComplete = (data) => {
       setIsStreaming(false);
+      setLoading(false);
       setStreamingContent("");
       // Server emits { assistantMessage } — add it to the list
       const aiMsg = data?.assistantMessage || data?.message;
@@ -246,14 +248,23 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       onTriggerRefresh?.();
     };
 
+    const handleError = (data) => {
+      setIsStreaming(false);
+      setLoading(false);
+      setStreamingContent("");
+      console.error("Socket error during generation:", data);
+    };
+
     socket.on("user_message_saved", handleUserMsgSaved);
     socket.on("message_chunk", handleChunk);
     socket.on("message_complete", handleComplete);
+    socket.on("error", handleError);
 
     return () => {
       socket.off("user_message_saved", handleUserMsgSaved);
       socket.off("message_chunk", handleChunk);
       socket.off("message_complete", handleComplete);
+      socket.off("error", handleError);
     };
   }, [socket, onTriggerRefresh]);
 
@@ -391,6 +402,10 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       createdAt: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
+    setLoading(true);
+    setIsStreaming(true);
+    setStreamingContent("");
+    scrollToBottom();
 
     // Use socket streaming if connected — AI chunks arrive in real-time
     if (socket && socket.connected) {
@@ -408,6 +423,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     // Fallback: HTTP request if socket not available
     try {
       setLoading(true);
+      setIsStreaming(true);
       const res = await messageApi.send(convId, {
         content: textToSend,
         attachmentIds,
@@ -605,24 +621,29 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
                     inset: -2,
                     borderRadius: "var(--radius-sm)",
                     border: "1.5px solid var(--accent-primary)",
-                    opacity: 0.7,
-                    animation: "pulseGlow 1.5s infinite ease-in-out",
+                    opacity: 0.85,
+                    animation: "pulseGlow 1.2s infinite ease-in-out",
                   }}
                 />
               </div>
               <div className="msg-body-wrapper">
-                <div className="msg-bubble">
+                <div className="msg-bubble" style={{ minWidth: 220 }}>
                   {streamingContent ? (
                     <div>
                       {renderBubbleContent(streamingContent)}
                       <span className="streaming-cursor"></span>
                     </div>
                   ) : (
-                    <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "2px 0", color: "var(--text-secondary)" }}>
-                      <Loader size={15} className="spin" color="var(--accent-primary)" />
-                      <span style={{ fontSize: "0.85rem", fontWeight: 500, color: "var(--text-primary)" }}>
-                        {isWebSearchEnabled ? "Searching web & synthesizing answer..." : "Thinking & generating response..."}
-                      </span>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "4px 2px", color: "var(--text-secondary)" }}>
+                      <Loader size={18} className="spin" color="var(--accent-primary)" />
+                      <div style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                        <span style={{ fontSize: "0.85rem", fontWeight: 600, color: "var(--text-primary)" }}>
+                          {isWebSearchEnabled ? "Searching web & synthesizing answer..." : "Thinking & generating response..."}
+                        </span>
+                        <span style={{ fontSize: "0.72rem", color: "var(--text-muted)" }}>
+                          {selectedModel} is preparing your answer...
+                        </span>
+                      </div>
                     </div>
                   )}
                 </div>
