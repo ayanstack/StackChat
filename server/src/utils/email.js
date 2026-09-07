@@ -12,19 +12,26 @@ const getTransporter = () => {
   const pass = env.SMTP_PASS ? env.SMTP_PASS.trim().replace(/\s+/g, "") : "";
 
   if (user && pass) {
+    if (user.includes("@gmail.com") || (env.SMTP_HOST && env.SMTP_HOST.includes("gmail"))) {
+      cachedTransporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user,
+          pass,
+        },
+        tls: { rejectUnauthorized: false },
+      });
+      return cachedTransporter;
+    }
+
     cachedTransporter = nodemailer.createTransport({
       host: env.SMTP_HOST || "smtp.gmail.com",
       port: Number(env.SMTP_PORT) || 587,
-      secure: false,
-      pool: true,
-      maxConnections: 5,
+      secure: Number(env.SMTP_PORT) === 465,
       auth: {
         user,
         pass,
       },
-      connectionTimeout: 10000,
-      greetingTimeout: 10000,
-      socketTimeout: 10000,
       tls: { rejectUnauthorized: false },
     });
     return cachedTransporter;
