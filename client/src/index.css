@@ -641,6 +641,7 @@ body {
   font-size: 0.9rem;
   line-height: 1.65;
   word-break: break-word;
+  overflow-wrap: anywhere;
 }
 
 .message-item.ai-message .msg-bubble {
@@ -813,6 +814,28 @@ body {
 }
 
 /* ----------------------------------------------------
+   RESPONSIVE GRID UTILITIES
+---------------------------------------------------- */
+.grid-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.grid-two-col-asym {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 18px;
+}
+
+.grid-responsive-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  align-items: end;
+}
+
+/* ----------------------------------------------------
    RESPONSIVE — MOBILE FIRST
 ---------------------------------------------------- */
 .mobile-menu-btn {
@@ -822,6 +845,13 @@ body {
 @media (max-width: 768px) {
   :root {
     --header-height: 52px;
+  }
+
+  .grid-two-col,
+  .grid-two-col-asym,
+  .grid-responsive-form {
+    grid-template-columns: 1fr !important;
+    gap: 14px;
   }
 
   .mobile-menu-btn {

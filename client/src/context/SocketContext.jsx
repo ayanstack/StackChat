@@ -24,8 +24,9 @@ export const SocketProvider = ({ children }) => {
     const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || undefined;
     const newSocket = io(BACKEND_URL, {
       auth: { token },
-      transports: ["websocket", "polling"],
-      reconnectionAttempts: 5,
+      transports: ["polling", "websocket"],
+      reconnectionAttempts: 8,
+      reconnectionDelay: 1000,
     });
 
     newSocket.on("connect", () => {

@@ -26,8 +26,13 @@ export const corsMiddleware = cors({
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
-    // Allow any *.vercel.app subdomain for preview deployments
-    if (/\.vercel\.app$/.test(origin)) {
+    // Allow any *.vercel.app or *.onrender.com domain or localhost
+    if (
+      /\.vercel\.app$/.test(origin) ||
+      /\.onrender\.com$/.test(origin) ||
+      origin.startsWith("http://localhost:") ||
+      origin.startsWith("http://127.0.0.1:")
+    ) {
       return callback(null, true);
     }
     callback(new Error("Not allowed by CORS"));

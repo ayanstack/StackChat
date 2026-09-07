@@ -173,7 +173,7 @@ export default function MemoryView() {
           <h3 style={{ fontSize: "0.9rem", fontWeight: 600, marginBottom: 14 }}>
             Create New Context Entry
           </h3>
-          <form onSubmit={handleCreateMemory} style={{ display: "grid", gridTemplateColumns: "1fr 2fr 1fr auto", gap: 12, alignItems: "end" }}>
+          <form onSubmit={handleCreateMemory} className="grid-responsive-form">
             <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Key / Identifier</label>
               <input

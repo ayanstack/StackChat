@@ -68,7 +68,7 @@ export default function ImageGenView() {
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr auto", gap: 12, alignItems: "end" }}>
+          <div className="grid-responsive-form">
             <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Aspect Ratio</label>
               <select className="select-field" value={size} onChange={(e) => setSize(e.target.value)}>

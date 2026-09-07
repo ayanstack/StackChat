@@ -253,7 +253,7 @@ export default function CsvStudioView() {
           </div>
 
           {/* Analytical Controls Split: Aggregations & Visualizations */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          <div className="grid-two-col">
             {/* Aggregation Tool */}
             <div className="card" style={{ padding: 18 }}>
               <h3 style={{ fontSize: "0.9rem", fontWeight: 600, marginBottom: 14, display: "flex", alignItems: "center", gap: 8 }}>

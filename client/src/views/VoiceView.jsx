@@ -86,7 +86,7 @@ export default function VoiceView() {
         </p>
       </div>
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+      <div className="grid-two-col">
         {/* Speech to Text */}
         <div className="card" style={{ padding: 18 }}>
           <h3 style={{ fontSize: "0.88rem", fontWeight: 600, marginBottom: 14, display: "flex", alignItems: "center", gap: 7 }}>

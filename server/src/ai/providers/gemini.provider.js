@@ -97,7 +97,7 @@ async function prepareContents(messages = [], images = []) {
 async function generateReply({
   messages,
   systemPrompt,
-  model = "gemini-3.8-flash",
+  model = "gemini-3.5-flash-lite",
   images = [],
   webSearch = false,
 }) {
@@ -105,7 +105,7 @@ async function generateReply({
     throw ApiError.badRequest("GEMINI_API_KEY is missing or invalid in environment variables.");
   }
 
-  const primaryModel = MODEL_MAP[model] || "gemini-3.8-flash";
+  const primaryModel = MODEL_MAP[model] || "gemini-3.5-flash-lite";
   const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
 
   const contents = await prepareContents(messages, images);
@@ -143,8 +143,19 @@ async function generateReply({
         parts.map((p) => p.text || "").join("");
 
       if (text) {
+        let content = text;
+        const grounding = data.candidates?.[0]?.groundingMetadata;
+        if (webSearch && grounding?.groundingChunks?.length) {
+          const sources = grounding.groundingChunks
+            .filter((c) => c.web?.uri)
+            .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
+          if (sources.length > 0) {
+            content += `\n\n**Sources & Real-time Citations:**\n` + sources.slice(0, 5).join("\n");
+          }
+        }
+
         return {
-          content: text,
+          content,
           metadata: {
             model: candidate,
             promptTokens: usage.promptTokenCount || 0,
@@ -170,7 +181,7 @@ async function generateReply({
 async function generateReplyStream({
   messages,
   systemPrompt,
-  model = "gemini-3.8-flash",
+  model = "gemini-3.5-flash-lite",
   images = [],
   webSearch = false,
   onChunk,
@@ -179,7 +190,7 @@ async function generateReplyStream({
     throw ApiError.badRequest("GEMINI_API_KEY is missing or invalid in environment variables.");
   }
 
-  const primaryModel = MODEL_MAP[model] || "gemini-3.8-flash";
+  const primaryModel = MODEL_MAP[model] || "gemini-3.5-flash-lite";
   const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
 
   const contents = await prepareContents(messages, images);
@@ -208,6 +219,7 @@ async function generateReplyStream({
 
       if (response.body) {
         let fullText = "";
+        let groundingSources = [];
         const decoder = new TextDecoder("utf-8");
 
         if (typeof response.body.getReader === "function") {
@@ -228,6 +240,14 @@ async function generateReplyStream({
                   const jsonStr = line.replace(/^data:\s*/, "").trim();
                   if (!jsonStr) continue;
                   const parsed = JSON.parse(jsonStr);
+
+                  const grounding = parsed.candidates?.[0]?.groundingMetadata;
+                  if (grounding?.groundingChunks?.length) {
+                    groundingSources = grounding.groundingChunks
+                      .filter((c) => c.web?.uri)
+                      .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
+                  }
+
                   const parts = parsed.candidates?.[0]?.content?.parts || [];
                   const text =
                     parts
@@ -257,6 +277,14 @@ async function generateReplyStream({
                   const jsonStr = line.replace(/^data:\s*/, "").trim();
                   if (!jsonStr) continue;
                   const parsed = JSON.parse(jsonStr);
+
+                  const grounding = parsed.candidates?.[0]?.groundingMetadata;
+                  if (grounding?.groundingChunks?.length) {
+                    groundingSources = grounding.groundingChunks
+                      .filter((c) => c.web?.uri)
+                      .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
+                  }
+
                   const parts = parsed.candidates?.[0]?.content?.parts || [];
                   const text =
                     parts
@@ -274,6 +302,12 @@ async function generateReplyStream({
               }
             }
           }
+        }
+
+        if (webSearch && groundingSources.length > 0) {
+          const sourcesText = `\n\n**Sources & Real-time Citations:**\n` + groundingSources.slice(0, 5).join("\n");
+          fullText += sourcesText;
+          onChunk(sourcesText);
         }
 
         if (fullText) {

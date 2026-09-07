@@ -68,7 +68,7 @@ export default function VisionView() {
         </div>
       )}
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1.1fr", gap: 18 }}>
+      <div className="grid-two-col-asym">
         {/* Upload Column */}
         <div className="card" style={{ padding: 18 }}>
           <h3 style={{ fontSize: "0.88rem", fontWeight: 600, marginBottom: 12 }}>Visual Input</h3>

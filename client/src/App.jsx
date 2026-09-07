@@ -61,7 +61,19 @@ function ProtectedView({ user, onOpenAuth, children }) {
 export default function App() {
   const { user } = useAuth();
   const [activeView, setActiveView] = useState("chat");
-  const [activeConvId, setActiveConvId] = useState(null);
+  const [activeConvId, setActiveConvIdState] = useState(() => {
+    return sessionStorage.getItem("stackchat_active_conv") || null;
+  });
+
+  const setActiveConvId = (id) => {
+    setActiveConvIdState(id);
+    if (id) {
+      sessionStorage.setItem("stackchat_active_conv", id);
+    } else {
+      sessionStorage.removeItem("stackchat_active_conv");
+    }
+  };
+
   const [authModalConfig, setAuthModalConfig] = useState({ open: false, mode: "login", token: "" });
   const [refreshSignal, setRefreshSignal] = useState(0);
   const [selectedModel, setSelectedModel] = useState("gemini-3.5-flash-lite");

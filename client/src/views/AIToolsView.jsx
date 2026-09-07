@@ -162,7 +162,7 @@ export default function AIToolsView() {
       </div>
 
       {/* Split Input / Output Panel */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+      <div className="grid-two-col">
         <div className="card" style={{ padding: 18 }}>
           <h3 style={{ fontSize: "0.88rem", fontWeight: 600, marginBottom: 14, display: "flex", alignItems: "center", gap: 7 }}>
             {activeMeta && React.createElement(activeMeta.icon, { size: 15, color: activeMeta.color })}

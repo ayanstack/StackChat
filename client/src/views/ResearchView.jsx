@@ -85,7 +85,7 @@ export default function ResearchView() {
             />
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr auto", gap: 12, alignItems: "end" }}>
+          <div className="grid-responsive-form">
             <div className="input-group" style={{ marginBottom: 0 }}>
               <label className="input-label">Investigation Depth</label>
               <select className="select-field" value={depth} onChange={(e) => setDepth(e.target.value)}>

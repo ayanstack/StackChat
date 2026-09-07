@@ -21,13 +21,15 @@ async function startServer() {
     );
   });
 
-  process.on("SIGINT", () => {
-    logger.info("SIGINT received. Shutting down gracefully...");
-
+  const shutdown = (signal) => {
+    logger.info(`${signal} received. Shutting down gracefully...`);
     server.close(() => {
       process.exit(0);
     });
-  });
+  };
+
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
 }
 
 startServer();

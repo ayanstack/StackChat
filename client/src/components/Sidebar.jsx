@@ -73,7 +73,18 @@ export default function Sidebar({
     try {
       const res = await conversationApi.list({ limit: 50 });
       if (res && res.data) {
-        setConversations(res.data.conversations || res.data || []);
+        const convList = res.data.conversations || res.data || [];
+        setConversations(convList);
+
+        if (!activeConvId && convList.length > 0) {
+          const savedId = sessionStorage.getItem("stackchat_active_conv");
+          const found = convList.find((c) => c._id === savedId);
+          if (found) {
+            setActiveConvId(found._id);
+          } else {
+            setActiveConvId(convList[0]._id);
+          }
+        }
       }
     } catch (err) {
       console.warn("Failed to fetch conversations:", err);

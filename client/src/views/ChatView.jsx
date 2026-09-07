@@ -496,7 +496,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
               <div
                 style={{
                   display: "grid",
-                  gridTemplateColumns: "repeat(2, 1fr)",
+                  gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
                   gap: 10,
                   marginTop: 28,
                   textAlign: "left",

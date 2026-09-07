@@ -56,7 +56,27 @@ export const AuthProvider = ({ children }) => {
 
     initAuth();
 
-    return () => clearInterval(keepAliveTimer);
+    // Cross-tab login/logout synchronization
+    const handleStorageChange = (e) => {
+      if (e.key === "stackchat_user") {
+        if (!e.newValue) {
+          setUser(null);
+        } else {
+          try {
+            setUser(JSON.parse(e.newValue));
+          } catch (err) {}
+        }
+      } else if (e.key === "stackchat_token" && !e.newValue) {
+        setUser(null);
+      }
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+
+    return () => {
+      clearInterval(keepAliveTimer);
+      window.removeEventListener("storage", handleStorageChange);
+    };
   }, []);
 
   const login = async (email, password) => {
