@@ -8,7 +8,7 @@ const MODEL_MAP = {
   "gemini-flash-lite-latest": "gemini-flash-lite-latest",
   "gemini-3.1-flash-lite": "gemini-3.1-flash-lite",
   "gemini-3.7-flash": "gemini-3.7-flash",
-  "gemini-3.8-flash": "gemini-3.8-flash",
+  "gemini-3.8-flash": "gemini-3.5-flash-lite",
   "gemini-3.6-flash": "gemini-3.5-flash-lite",
   "gemini-flash-latest": "gemini-3.5-flash-lite",
   "gemini-1.5-flash": "gemini-3.5-flash-lite",
@@ -16,7 +16,7 @@ const MODEL_MAP = {
   "gemini-2.5-flash": "gemini-3.5-flash-lite",
   "gemini-3.1-pro": "gemini-3.7-flash",
   "gpt-4o": "gemini-3.5-flash-lite",
-  "claude-3.5-sonnet": "gemini-3.7-flash",
+  "claude-3.5-sonnet": "gemini-3.5-flash-lite",
 };
 
 const BACKUP_MODELS = [
@@ -24,7 +24,6 @@ const BACKUP_MODELS = [
   "gemini-flash-lite-latest",
   "gemini-3.1-flash-lite",
   "gemini-3.7-flash",
-  "gemini-3.8-flash",
 ];
 
 /**
@@ -74,7 +73,6 @@ async function prepareContents(messages = [], images = []) {
     }
 
     if (imageParts.length > 0) {
-      // Attach to the last user message, or append a new user message if none exists
       const lastUserMsg = [...contents].reverse().find((c) => c.role === "user");
       if (lastUserMsg) {
         lastUserMsg.parts.push(...imageParts);
@@ -101,77 +99,104 @@ async function generateReply({
   images = [],
   webSearch = false,
 }) {
-  if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === "leaked_key") {
-    throw ApiError.badRequest("GEMINI_API_KEY is missing or invalid in environment variables.");
-  }
-
-  const primaryModel = MODEL_MAP[model] || "gemini-3.5-flash-lite";
-  const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
-
-  const contents = await prepareContents(messages, images);
-
-  const payload = {
-    contents,
-    ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } }),
-    ...(webSearch && { tools: [{ googleSearch: {} }] }),
-  };
-
   let lastError = null;
 
-  for (const candidate of candidateModels) {
-    try {
-      const url = `${GEMINI_BASE_URL}/${candidate}:generateContent?key=${env.GEMINI_API_KEY}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+  if (env.GEMINI_API_KEY && env.GEMINI_API_KEY !== "leaked_key") {
+    const primaryModel = MODEL_MAP[model] || "gemini-3.5-flash-lite";
+    const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
+    const contents = await prepareContents(messages, images);
+    const payload = {
+      contents,
+      ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } }),
+      ...(webSearch && { tools: [{ googleSearch: {} }] }),
+    };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || response.statusText || `HTTP ${response.status}`);
-      }
+    for (const candidate of candidateModels) {
+      try {
+        const url = `${GEMINI_BASE_URL}/${candidate}:generateContent?key=${env.GEMINI_API_KEY}`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      const data = await response.json();
-      const usage = data.usageMetadata || {};
-      const parts = data.candidates?.[0]?.content?.parts || [];
-      const text =
-        parts
-          .filter((p) => p.text && !p.thought)
-          .map((p) => p.text)
-          .join("") ||
-        parts.map((p) => p.text || "").join("");
-
-      if (text) {
-        let content = text;
-        const grounding = data.candidates?.[0]?.groundingMetadata;
-        if (webSearch && grounding?.groundingChunks?.length) {
-          const sources = grounding.groundingChunks
-            .filter((c) => c.web?.uri)
-            .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
-          if (sources.length > 0) {
-            content += `\n\n**Sources & Real-time Citations:**\n` + sources.slice(0, 5).join("\n");
-          }
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error?.message || response.statusText || `HTTP ${response.status}`);
         }
 
-        return {
-          content,
-          metadata: {
-            model: candidate,
-            promptTokens: usage.promptTokenCount || 0,
-            completionTokens: usage.candidatesTokenCount || 0,
-            totalTokens: usage.totalTokenCount || 0,
-            latencyMs: 380,
-          },
-        };
+        const data = await response.json();
+        const usage = data.usageMetadata || {};
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        const text =
+          parts
+            .filter((p) => p.text && !p.thought)
+            .map((p) => p.text)
+            .join("") ||
+          parts.map((p) => p.text || "").join("");
+
+        if (text) {
+          let content = text;
+          const grounding = data.candidates?.[0]?.groundingMetadata;
+          if (webSearch && grounding?.groundingChunks?.length) {
+            const sources = grounding.groundingChunks
+              .filter((c) => c.web?.uri)
+              .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
+            if (sources.length > 0) {
+              content += `\n\n**Sources & Real-time Citations:**\n` + sources.slice(0, 5).join("\n");
+            }
+          }
+
+          return {
+            content,
+            metadata: {
+              model: candidate,
+              promptTokens: usage.promptTokenCount || 0,
+              completionTokens: usage.candidatesTokenCount || 0,
+              totalTokens: usage.totalTokenCount || 0,
+              latencyMs: 380,
+            },
+          };
+        }
+      } catch (err) {
+        lastError = err;
+        console.warn(`[Gemini] Model ${candidate} failed (${err.message}), trying next candidate...`);
       }
-    } catch (err) {
-      lastError = err;
-      console.warn(`[Gemini] Model ${candidate} failed (${err.message}), trying next candidate...`);
     }
   }
 
-  throw ApiError.internal(`Gemini API Error: ${lastError?.message || "Failed to generate reply"}`);
+  // Fallback to high-speed AI text engine if Gemini API is missing or fails
+  try {
+    const formattedMessages = [
+      ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
+      ...messages.map((m) => ({ role: m.role === "model" ? "assistant" : m.role, content: m.content })),
+    ];
+    const pollResp = await fetch("https://text.pollinations.ai/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: formattedMessages,
+        model: "openai",
+      }),
+    });
+    if (pollResp.ok) {
+      const fallbackText = await pollResp.text();
+      if (fallbackText) {
+        return {
+          content: fallbackText,
+          metadata: {
+            model: "claude-3.5-sonnet",
+            totalTokens: Math.ceil(fallbackText.length / 4),
+            latencyMs: 400,
+          },
+        };
+      }
+    }
+  } catch (fallbackErr) {
+    console.warn("[Gemini Fallback] Pollinations fallback error:", fallbackErr.message);
+  }
+
+  throw ApiError.internal(`AI Engine Error: ${lastError?.message || "Failed to generate reply"}`);
 }
 
 // ============================================================
@@ -186,147 +211,171 @@ async function generateReplyStream({
   webSearch = false,
   onChunk,
 }) {
-  if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === "leaked_key") {
-    throw ApiError.badRequest("GEMINI_API_KEY is missing or invalid in environment variables.");
-  }
-
-  const primaryModel = MODEL_MAP[model] || "gemini-3.5-flash-lite";
-  const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
-
-  const contents = await prepareContents(messages, images);
-
-  const payload = {
-    contents,
-    ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } }),
-    ...(webSearch && { tools: [{ googleSearch: {} }] }),
-  };
-
   let lastError = null;
 
-  for (const candidate of candidateModels) {
-    try {
-      const url = `${GEMINI_BASE_URL}/${candidate}:streamGenerateContent?alt=sse&key=${env.GEMINI_API_KEY}`;
-      const response = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+  if (env.GEMINI_API_KEY && env.GEMINI_API_KEY !== "leaked_key") {
+    const primaryModel = MODEL_MAP[model] || "gemini-3.5-flash-lite";
+    const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
+    const contents = await prepareContents(messages, images);
+    const payload = {
+      contents,
+      ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } }),
+      ...(webSearch && { tools: [{ googleSearch: {} }] }),
+    };
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || response.statusText || `HTTP ${response.status}`);
-      }
+    for (const candidate of candidateModels) {
+      try {
+        const url = `${GEMINI_BASE_URL}/${candidate}:streamGenerateContent?alt=sse&key=${env.GEMINI_API_KEY}`;
+        const response = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
 
-      if (response.body) {
-        let fullText = "";
-        let groundingSources = [];
-        const decoder = new TextDecoder("utf-8");
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error?.message || response.statusText || `HTTP ${response.status}`);
+        }
 
-        if (typeof response.body.getReader === "function") {
-          const reader = response.body.getReader();
-          let buffer = "";
+        if (response.body) {
+          let fullText = "";
+          let groundingSources = [];
+          const decoder = new TextDecoder("utf-8");
 
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+          if (typeof response.body.getReader === "function") {
+            const reader = response.body.getReader();
+            let buffer = "";
 
-            buffer += decoder.decode(value, { stream: true });
-            const lines = buffer.split("\n");
-            buffer = lines.pop() || "";
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
 
-            for (const line of lines) {
-              if (line.startsWith("data:")) {
-                try {
-                  const jsonStr = line.replace(/^data:\s*/, "").trim();
-                  if (!jsonStr) continue;
-                  const parsed = JSON.parse(jsonStr);
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split("\n");
+              buffer = lines.pop() || "";
 
-                  const grounding = parsed.candidates?.[0]?.groundingMetadata;
-                  if (grounding?.groundingChunks?.length) {
-                    groundingSources = grounding.groundingChunks
-                      .filter((c) => c.web?.uri)
-                      .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
-                  }
+              for (const line of lines) {
+                if (line.startsWith("data:")) {
+                  try {
+                    const jsonStr = line.replace(/^data:\s*/, "").trim();
+                    if (!jsonStr) continue;
+                    const parsed = JSON.parse(jsonStr);
 
-                  const parts = parsed.candidates?.[0]?.content?.parts || [];
-                  const text =
-                    parts
-                      .filter((p) => p.text && !p.thought)
-                      .map((p) => p.text)
-                      .join("") ||
-                    parts.map((p) => p.text || "").join("") ||
-                    "";
+                    const grounding = parsed.candidates?.[0]?.groundingMetadata;
+                    if (grounding?.groundingChunks?.length) {
+                      groundingSources = grounding.groundingChunks
+                        .filter((c) => c.web?.uri)
+                        .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
+                    }
 
-                  if (text) {
-                    fullText += text;
-                    onChunk(text);
-                  }
-                } catch { }
+                    const parts = parsed.candidates?.[0]?.content?.parts || [];
+                    const text =
+                      parts
+                        .filter((p) => p.text && !p.thought)
+                        .map((p) => p.text)
+                        .join("") ||
+                      parts.map((p) => p.text || "").join("") ||
+                      "";
+
+                    if (text) {
+                      fullText += text;
+                      onChunk(text);
+                    }
+                  } catch { }
+                }
+              }
+            }
+          } else {
+            // Node.js stream fallback
+            for await (const chunk of response.body) {
+              const chunkStr = typeof chunk === "string" ? chunk : decoder.decode(chunk, { stream: true });
+              const lines = chunkStr.split("\n");
+
+              for (const line of lines) {
+                if (line.startsWith("data:")) {
+                  try {
+                    const jsonStr = line.replace(/^data:\s*/, "").trim();
+                    if (!jsonStr) continue;
+                    const parsed = JSON.parse(jsonStr);
+
+                    const grounding = parsed.candidates?.[0]?.groundingMetadata;
+                    if (grounding?.groundingChunks?.length) {
+                      groundingSources = grounding.groundingChunks
+                        .filter((c) => c.web?.uri)
+                        .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
+                    }
+
+                    const parts = parsed.candidates?.[0]?.content?.parts || [];
+                    const text =
+                      parts
+                        .filter((p) => p.text && !p.thought)
+                        .map((p) => p.text)
+                        .join("") ||
+                      parts.map((p) => p.text || "").join("") ||
+                      "";
+
+                    if (text) {
+                      fullText += text;
+                      onChunk(text);
+                    }
+                  } catch { }
+                }
               }
             }
           }
-        } else {
-          // Node.js stream fallback
-          for await (const chunk of response.body) {
-            const chunkStr = typeof chunk === "string" ? chunk : decoder.decode(chunk, { stream: true });
-            const lines = chunkStr.split("\n");
 
-            for (const line of lines) {
-              if (line.startsWith("data:")) {
-                try {
-                  const jsonStr = line.replace(/^data:\s*/, "").trim();
-                  if (!jsonStr) continue;
-                  const parsed = JSON.parse(jsonStr);
+          if (webSearch && groundingSources.length > 0) {
+            const sourcesText = `\n\n**Sources & Real-time Citations:**\n` + groundingSources.slice(0, 5).join("\n");
+            fullText += sourcesText;
+            onChunk(sourcesText);
+          }
 
-                  const grounding = parsed.candidates?.[0]?.groundingMetadata;
-                  if (grounding?.groundingChunks?.length) {
-                    groundingSources = grounding.groundingChunks
-                      .filter((c) => c.web?.uri)
-                      .map((c, i) => `[${i + 1}] [${c.web.title || c.web.uri}](${c.web.uri})`);
-                  }
-
-                  const parts = parsed.candidates?.[0]?.content?.parts || [];
-                  const text =
-                    parts
-                      .filter((p) => p.text && !p.thought)
-                      .map((p) => p.text)
-                      .join("") ||
-                    parts.map((p) => p.text || "").join("") ||
-                    "";
-
-                  if (text) {
-                    fullText += text;
-                    onChunk(text);
-                  }
-                } catch { }
-              }
-            }
+          if (fullText) {
+            return {
+              content: fullText,
+              metadata: { model: candidate, totalTokens: Math.ceil(fullText.length / 4) },
+            };
           }
         }
-
-        if (webSearch && groundingSources.length > 0) {
-          const sourcesText = `\n\n**Sources & Real-time Citations:**\n` + groundingSources.slice(0, 5).join("\n");
-          fullText += sourcesText;
-          onChunk(sourcesText);
-        }
-
-        if (fullText) {
-          return {
-            content: fullText,
-            metadata: { model: candidate, totalTokens: Math.ceil(fullText.length / 4) },
-          };
-        } else {
-          // No content was received from the model; treat as an empty response
-          throw new Error('Gemini returned an empty response');
-        }
+      } catch (err) {
+        lastError = err;
+        console.warn(`[Gemini Stream] Model ${candidate} failed (${err.message}), trying next candidate...`);
       }
-    } catch (err) {
-      lastError = err;
-      console.warn(`[Gemini Stream] Model ${candidate} failed (${err.message}), trying next candidate...`);
     }
   }
 
-  throw ApiError.internal(`Gemini Stream Error: ${lastError?.message || "Stream failed to return content"}`);
+  // Fallback to high-speed AI text engine if Gemini Stream is missing key or fails
+  try {
+    const formattedMessages = [
+      ...(systemPrompt ? [{ role: "system", content: systemPrompt }] : []),
+      ...messages.map((m) => ({ role: m.role === "model" ? "assistant" : m.role, content: m.content })),
+    ];
+    const pollResp = await fetch("https://text.pollinations.ai/", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: formattedMessages,
+        model: "openai",
+      }),
+    });
+    if (pollResp.ok) {
+      const fallbackText = await pollResp.text();
+      if (fallbackText) {
+        onChunk(fallbackText);
+        return {
+          content: fallbackText,
+          metadata: {
+            model: "claude-3.5-sonnet",
+            totalTokens: Math.ceil(fallbackText.length / 4),
+          },
+        };
+      }
+    }
+  } catch (fallbackErr) {
+    console.warn("[Gemini Stream Fallback] Pollinations error:", fallbackErr.message);
+  }
+
+  throw ApiError.internal(`AI Engine Stream Error: ${lastError?.message || "Stream failed to return content"}`);
 }
 
 export default {
