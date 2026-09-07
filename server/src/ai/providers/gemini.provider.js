@@ -4,20 +4,27 @@ import ApiError from "../../utils/ApiError.js";
 const GEMINI_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/models";
 
 const MODEL_MAP = {
-  "gemini-flash-latest": "gemini-flash-latest",
-  "gemini-3.6-flash": "gemini-3.6-flash",
+  "gemini-3.5-flash-lite": "gemini-3.5-flash-lite",
   "gemini-flash-lite-latest": "gemini-flash-lite-latest",
-  "gemini-1.5-flash": "gemini-flash-latest",
-  "gemini-1.5-pro": "gemini-flash-latest",
-  "gemini-2.5-flash": "gemini-flash-latest",
-  "gpt-4o": "gemini-flash-latest",
-  "claude-3.5-sonnet": "gemini-flash-latest",
+  "gemini-3.1-flash-lite": "gemini-3.1-flash-lite",
+  "gemini-3.7-flash": "gemini-3.7-flash",
+  "gemini-3.8-flash": "gemini-3.8-flash",
+  "gemini-3.6-flash": "gemini-3.5-flash-lite",
+  "gemini-flash-latest": "gemini-3.5-flash-lite",
+  "gemini-1.5-flash": "gemini-3.5-flash-lite",
+  "gemini-1.5-pro": "gemini-3.7-flash",
+  "gemini-2.5-flash": "gemini-3.5-flash-lite",
+  "gemini-3.1-pro": "gemini-3.7-flash",
+  "gpt-4o": "gemini-3.5-flash-lite",
+  "claude-3.5-sonnet": "gemini-3.7-flash",
 };
 
 const BACKUP_MODELS = [
-  "gemini-flash-latest",
-  "gemini-3.6-flash",
+  "gemini-3.5-flash-lite",
   "gemini-flash-lite-latest",
+  "gemini-3.1-flash-lite",
+  "gemini-3.7-flash",
+  "gemini-3.8-flash",
 ];
 
 /**
@@ -90,14 +97,15 @@ async function prepareContents(messages = [], images = []) {
 async function generateReply({
   messages,
   systemPrompt,
-  model = "gemini-3.6-flash",
+  model = "gemini-3.8-flash",
   images = [],
+  webSearch = false,
 }) {
   if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === "leaked_key") {
     throw ApiError.badRequest("GEMINI_API_KEY is missing or invalid in environment variables.");
   }
 
-  const primaryModel = MODEL_MAP[model] || "gemini-3.6-flash";
+  const primaryModel = MODEL_MAP[model] || "gemini-3.8-flash";
   const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
 
   const contents = await prepareContents(messages, images);
@@ -105,6 +113,7 @@ async function generateReply({
   const payload = {
     contents,
     ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } }),
+    ...(webSearch && { tools: [{ googleSearch: {} }] }),
   };
 
   let lastError = null;
@@ -161,15 +170,16 @@ async function generateReply({
 async function generateReplyStream({
   messages,
   systemPrompt,
-  model = "gemini-3.6-flash",
+  model = "gemini-3.8-flash",
   images = [],
+  webSearch = false,
   onChunk,
 }) {
   if (!env.GEMINI_API_KEY || env.GEMINI_API_KEY === "leaked_key") {
     throw ApiError.badRequest("GEMINI_API_KEY is missing or invalid in environment variables.");
   }
 
-  const primaryModel = MODEL_MAP[model] || "gemini-3.6-flash";
+  const primaryModel = MODEL_MAP[model] || "gemini-3.8-flash";
   const candidateModels = [primaryModel, ...BACKUP_MODELS.filter((m) => m !== primaryModel)];
 
   const contents = await prepareContents(messages, images);
@@ -177,6 +187,7 @@ async function generateReplyStream({
   const payload = {
     contents,
     ...(systemPrompt && { systemInstruction: { parts: [{ text: systemPrompt }] } }),
+    ...(webSearch && { tools: [{ googleSearch: {} }] }),
   };
 
   let lastError = null;
@@ -230,7 +241,7 @@ async function generateReplyStream({
                     fullText += text;
                     onChunk(text);
                   }
-                } catch {}
+                } catch { }
               }
             }
           }
@@ -259,7 +270,7 @@ async function generateReplyStream({
                     fullText += text;
                     onChunk(text);
                   }
-                } catch {}
+                } catch { }
               }
             }
           }

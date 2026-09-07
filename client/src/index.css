@@ -797,29 +797,40 @@ body {
 
 .streaming-cursor {
   display: inline-block;
-  width: 6px;
-  height: 14px;
-  background-color: var(--accent-primary);
-  margin-left: 3px;
+  width: 8px;
+  height: 8px;
+  background: var(--accent-primary);
+  margin-left: 4px;
   vertical-align: middle;
-  border-radius: 1px;
-  animation: cursorBlink 0.9s infinite;
+  border-radius: 50%;
+  animation: cursorPulse 1s ease-in-out infinite;
+  box-shadow: 0 0 6px var(--accent-primary-glow);
+}
+
+@keyframes cursorPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
 }
 
 /* ----------------------------------------------------
-   RESPONSIVE UTILITIES
+   RESPONSIVE — MOBILE FIRST
 ---------------------------------------------------- */
 .mobile-menu-btn {
   display: none;
 }
 
 @media (max-width: 768px) {
+  :root {
+    --header-height: 52px;
+  }
+
   .mobile-menu-btn {
     display: flex;
     align-items: center;
     justify-content: center;
   }
 
+  /* Sidebar slides in from left as a drawer */
   .sidebar {
     position: fixed;
     top: 0;
@@ -836,8 +847,56 @@ body {
     transform: translateX(0);
   }
 
+  /* Top bar: tighter on mobile */
+  .top-bar {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  /* Hide model tag on very small screens */
+  .top-bar .model-tag-text {
+    display: none;
+  }
+
+  /* Chat area: more bottom padding for the fixed composer */
   .chat-scroll-area {
-    padding: 16px 12px 140px;
+    padding: 12px 10px 160px;
+  }
+
+  /* Message bubbles: wider on mobile */
+  .msg-body-wrapper {
+    max-width: 92%;
+  }
+
+  .msg-bubble {
+    font-size: 0.88rem;
+    padding: 10px 13px;
+  }
+
+  /* Composer dock */
+  .composer-dock-container {
+    padding: 10px 10px 12px;
+  }
+
+  .composer-box {
+    border-radius: var(--radius-lg);
+    padding: 8px 12px;
+  }
+
+  .composer-textarea {
+    font-size: 0.88rem;
+  }
+
+  /* Message meta row: keep compact */
+  .msg-meta {
+    font-size: 0.68rem;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  /* Breadcrumb: shorten subtitle */
+  .breadcrumb-label {
+    font-size: 0.82rem;
   }
 }
 

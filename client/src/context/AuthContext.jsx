@@ -18,7 +18,7 @@ export const AuthProvider = ({ children }) => {
     }, 4 * 60 * 1000);
 
     const initAuth = async () => {
-      // 1. Instantly load cached user from localStorage so page reload NEVER drops session
+      // Restore cached user immediately for instant UI
       const cachedUserStr = localStorage.getItem("stackchat_user");
       if (cachedUserStr) {
         try {
@@ -26,13 +26,13 @@ export const AuthProvider = ({ children }) => {
         } catch (e) {}
       }
 
-      const token = getAuthToken();
+      const token = localStorage.getItem("stackchat_token");
       if (!token) {
         setLoading(false);
         return;
       }
 
-      // 2. Validate session with server in the background
+      // Validate session with server in background
       try {
         const res = await authApi.getMe();
         const verifiedUser = res.data?.user || res.data;
@@ -41,14 +41,12 @@ export const AuthProvider = ({ children }) => {
           localStorage.setItem("stackchat_user", JSON.stringify(verifiedUser));
         }
       } catch (err) {
-        // ONLY clear auth if the server explicitly confirmed the token is unauthorized (401)
         if (err.statusCode === 401) {
           console.warn("Session expired or token invalid:", err.message);
           setAuthToken("", "");
           localStorage.removeItem("stackchat_user");
           setUser(null);
         } else {
-          // If the server is waking up from cold start or temporary offline, KEEP user logged in!
           console.warn("Backend warming up or network delay, preserving cached session:", err.message);
         }
       } finally {

@@ -64,7 +64,7 @@ export default function App() {
   const [activeConvId, setActiveConvId] = useState(null);
   const [authModalConfig, setAuthModalConfig] = useState({ open: false, mode: "login", token: "" });
   const [refreshSignal, setRefreshSignal] = useState(0);
-  const [selectedModel, setSelectedModel] = useState("gemini-3.6-flash");
+  const [selectedModel, setSelectedModel] = useState("gemini-3.5-flash-lite");
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 

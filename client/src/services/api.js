@@ -1,6 +1,7 @@
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "";
 const API_BASE = `${BACKEND_URL}/api/v1`;
 
+// Auth tokens in localStorage so user stays logged in across all tabs and browser restarts until explicit logout.
 let accessToken = localStorage.getItem("stackchat_token") || "";
 let refreshToken = localStorage.getItem("stackchat_refresh_token") || "";
 
@@ -10,6 +11,7 @@ export const setAuthToken = (token, refToken = null) => {
     localStorage.setItem("stackchat_token", token);
   } else {
     localStorage.removeItem("stackchat_token");
+    localStorage.removeItem("stackchat_user");
   }
 
   if (refToken !== null) {

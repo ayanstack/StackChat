@@ -4,12 +4,12 @@ import ApiError from "../utils/ApiError.js";
 import { FILE_TYPES } from "../constants/enums.js";
 import logger from "../logger/logger.js";
 
-function detectFileType(mimeType) {
+function detectFileType(mimeType = "") {
   if (mimeType.startsWith("image/")) return FILE_TYPES.IMAGE;
   if (mimeType === "application/pdf") return FILE_TYPES.PDF;
-  if (mimeType.includes("wordprocessingml")) return FILE_TYPES.DOCX;
-  if (mimeType === "text/plain") return FILE_TYPES.TXT;
-  throw ApiError.badRequest(`Unsupported file type: ${mimeType}`);
+  if (mimeType.includes("wordprocessingml") || mimeType.includes("msword")) return FILE_TYPES.DOCX;
+  if (mimeType.startsWith("text/") || mimeType.includes("csv") || mimeType.includes("json")) return FILE_TYPES.TXT;
+  return FILE_TYPES.IMAGE; // default fallback
 }
 
 function uploadBufferToCloudinary(buffer, options) {

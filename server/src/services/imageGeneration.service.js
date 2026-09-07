@@ -26,7 +26,7 @@ export const generateImage = async ({ prompt, n = 1, size = "1024x1024", quality
         createdAt: new Date().toISOString(),
       };
     } catch (error) {
-      throw ApiError.internal(`OpenAI Image Generation error: ${error.message}`);
+      console.warn("OpenAI Image Generation failed, using high-speed Flux fallback:", error.message);
     }
   }
 
@@ -68,21 +68,32 @@ export const generateImage = async ({ prompt, n = 1, size = "1024x1024", quality
         createdAt: new Date().toISOString(),
       };
     } catch (error) {
-      throw ApiError.internal(`Stability AI error: ${error.message}`);
+      console.warn("Stability AI failed, using high-speed Flux fallback:", error.message);
     }
   }
 
-  // Free Fallback Image Generator (No API Key Required)
+  // High-Quality Fallback AI Image Generator (Pollinations Flux / Turbo)
   try {
-    const encodedPrompt = encodeURIComponent(prompt);
-    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true&width=1024&height=1024`;
+    let width = 1024;
+    let height = 1024;
+
+    if (size && typeof size === "string" && size.includes("x")) {
+      const parts = size.split("x");
+      width = parseInt(parts[0], 10) || 1024;
+      height = parseInt(parts[1], 10) || 1024;
+    }
+
+    const seed = Math.floor(Math.random() * 10000000);
+    const enhancedPrompt = style === "vivid" ? `${prompt}, highly detailed, 8k resolution, cinematic lighting, masterpiece` : `${prompt}, natural lighting, photorealistic, clean details`;
+    const encodedPrompt = encodeURIComponent(enhancedPrompt);
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?nologo=true&width=${width}&height=${height}&seed=${seed}&model=flux`;
     
     return {
-      provider: "pollinations-ai",
+      provider: "flux-ai",
       prompt,
       images: [{
         url: imageUrl,
-        revisedPrompt: prompt
+        revisedPrompt: enhancedPrompt,
       }],
       createdAt: new Date().toISOString(),
     };

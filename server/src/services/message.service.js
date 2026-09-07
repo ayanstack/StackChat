@@ -42,11 +42,12 @@ async function validateAttachments(userId, attachmentIds) {
   return attachments;
 }
 
-async function createAssistantReply(conversation, currentMessage = null) {
+async function createAssistantReply(conversation, currentMessage = null, options = {}) {
   try {
     const aiResult = await aiService.generateAIResponse(
       conversation,
-      currentMessage
+      currentMessage,
+      options
     );
 
     const assistantMessage = await Message.create({
@@ -84,7 +85,8 @@ async function sendMessage(
   conversationId,
   content,
   attachmentIds = [],
-  model = null
+  model = null,
+  options = {}
 ) {
   const conversation = await assertConversationOwnership(
     userId,
@@ -113,7 +115,8 @@ async function sendMessage(
 
   const assistantMessage = await createAssistantReply(
     conversation,
-    userMessage
+    userMessage,
+    options
   );
 
   return {
@@ -127,7 +130,8 @@ async function sendMessageStream(
   conversationId,
   content,
   attachmentIds = [],
-  model = null
+  model = null,
+  options = {}
 ) {
   const io = getIO();
   const room = `conversation:${conversationId}`;
@@ -164,7 +168,8 @@ async function sendMessageStream(
       (chunk) => {
         assistantContent += chunk;
         io.to(room).emit("message_chunk", { chunk });
-      }
+      },
+      options
     );
     aiMetadata = result?.metadata || {};
     aiMetadata.latencyMs = Date.now() - startTime;
@@ -280,7 +285,7 @@ Previous response:
     const aiResult = await provider.generateReply({
       messages: orderedMessages,
       systemPrompt: conversation.systemPrompt,
-      model: "gemini-3.6-flash",
+      model: conversation.model || "gemini-3.8-flash",
     });
 
     if (!aiResult || !aiResult.content) {

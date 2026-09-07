@@ -584,11 +584,20 @@ export function initializeSocket(server) {
           // SEND MESSAGE
           // -------------------------------------------
 
+          const model =
+            typeof payload.model === "string"
+              ? payload.model
+              : null;
+
+          const webSearch = Boolean(payload.webSearch);
+
           await messageService.sendMessageStream(
             socket.userId,
             conversationId,
             content,
-            attachmentIds
+            attachmentIds,
+            model,
+            { webSearch }
           );
 
           // -------------------------------------------

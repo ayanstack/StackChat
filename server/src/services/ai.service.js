@@ -9,7 +9,7 @@ import memoryService from "./memory.service.js";
 // GEMINI MODEL
 // ============================================================
 
-const DEFAULT_GEMINI_MODEL = "gemini-3.6-flash";
+const DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 // ============================================================
 // BUILD AI CONTEXT
@@ -108,6 +108,11 @@ async function buildSystemPrompt(conversation) {
       prompt = prompt ? `${prompt}\n${memoryContext}` : memoryContext.trim();
     }
   }
+
+  const imageInstruction =
+    "IMAGE GENERATION CAPABILITY: When the user asks to generate, create, draw, paint, or render an image or photo, craft a high-detail visual prompt and output it as a markdown image using: ![Description](https://image.pollinations.ai/prompt/{url_encoded_prompt}?nologo=true&model=flux). Always provide the markdown image directly in your response.";
+
+  prompt = prompt ? `${prompt}\n\n${imageInstruction}` : imageInstruction;
   return prompt;
 }
 
@@ -115,7 +120,7 @@ async function buildSystemPrompt(conversation) {
 // NON-STREAMING AI RESPONSE
 // ============================================================
 
-async function generateAIResponse(conversation, currentMessage = null) {
+async function generateAIResponse(conversation, currentMessage = null, options = {}) {
   const provider = getProvider();
 
   const { orderedMessages, images } = await buildContext(
@@ -134,6 +139,7 @@ async function generateAIResponse(conversation, currentMessage = null) {
     systemPrompt,
     model: conversation.model || DEFAULT_GEMINI_MODEL,
     images,
+    webSearch: Boolean(options.webSearch),
   });
 }
 
@@ -144,7 +150,8 @@ async function generateAIResponse(conversation, currentMessage = null) {
 async function generateAIResponseStream(
   conversation,
   currentMessage = null,
-  onChunk
+  onChunk,
+  options = {}
 ) {
   const provider = getProvider();
 
@@ -168,6 +175,7 @@ async function generateAIResponseStream(
     systemPrompt,
     model: conversation.model || DEFAULT_GEMINI_MODEL,
     images,
+    webSearch: Boolean(options.webSearch),
     onChunk,
   });
 }

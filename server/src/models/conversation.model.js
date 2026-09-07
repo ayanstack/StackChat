@@ -16,7 +16,7 @@ const conversationSchema = new mongoose.Schema(
     },
     model: {
       type: String,
-      default: "gemini-1.5-flash",
+      default: "gemini-3.5-flash-lite",
     },
     systemPrompt: {
       type: String,

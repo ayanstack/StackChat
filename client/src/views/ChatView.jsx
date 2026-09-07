@@ -17,12 +17,19 @@ import {
   CornerDownLeft,
   X,
   FileText,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext.jsx";
 import { useSocket } from "../context/SocketContext.jsx";
 import { messageApi, conversationApi, fileApi } from "../services/api.js";
 
 const QUICK_STARTERS = [
+  {
+    title: "AI Image Studio",
+    prompt: "Generate an image of a breathtaking futuristic neon skyline at night in 8k cinematic lighting.",
+    icon: Sparkles,
+    color: "var(--accent-purple, #a855f7)",
+  },
   {
     title: "Data Analysis",
     prompt: "Analyze our quarterly customer dataset and summarize retention trends.",
@@ -49,7 +56,115 @@ const QUICK_STARTERS = [
   },
 ];
 
-export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefresh, selectedModel = "gemini-1.5-flash" }) {
+function renderBubbleContent(content) {
+  if (!content) return null;
+
+  const imageRegex = /!\[([^\]]*)\]\((https?:\/\/[^\s)]+)\)/g;
+  const parts = [];
+  let lastIndex = 0;
+  let match;
+
+  while ((match = imageRegex.exec(content)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({
+        type: "text",
+        text: content.slice(lastIndex, match.index),
+      });
+    }
+    parts.push({
+      type: "image",
+      alt: match[1] || "Generated AI Asset",
+      url: match[2],
+    });
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < content.length) {
+    parts.push({
+      type: "text",
+      text: content.slice(lastIndex),
+    });
+  }
+
+  if (parts.length === 0) {
+    return <div style={{ whiteSpace: "pre-wrap" }}>{content}</div>;
+  }
+
+  return (
+    <div>
+      {parts.map((part, idx) => {
+        if (part.type === "image") {
+          return (
+            <div
+              key={idx}
+              style={{
+                margin: "10px 0",
+                borderRadius: "var(--radius-md)",
+                overflow: "hidden",
+                border: "1px solid var(--border-hairline)",
+                background: "rgba(0, 0, 0, 0.25)",
+                maxWidth: 480,
+              }}
+            >
+              <img
+                src={part.url}
+                alt={part.alt}
+                loading="lazy"
+                style={{
+                  width: "100%",
+                  maxHeight: 360,
+                  objectFit: "cover",
+                  display: "block",
+                }}
+              />
+              <div
+                style={{
+                  padding: "6px 10px",
+                  fontSize: "0.72rem",
+                  color: "var(--text-muted)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  background: "var(--bg-surface)",
+                  gap: 8,
+                }}
+              >
+                <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  {part.alt}
+                </span>
+                <a
+                  href={part.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn btn-secondary"
+                  style={{
+                    padding: "2px 7px",
+                    fontSize: "0.68rem",
+                    height: 22,
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4,
+                  }}
+                >
+                  <span>Open</span>
+                  <ExternalLink size={10} />
+                </a>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div key={idx} style={{ whiteSpace: "pre-wrap" }}>
+            {part.text}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefresh, selectedModel = "gemini-3.5-flash-lite" }) {
   const { user } = useAuth();
   const { socket } = useSocket();
   const [messages, setMessages] = useState([]);
@@ -101,6 +216,17 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
   useEffect(() => {
     if (!socket) return;
 
+    const handleUserMsgSaved = (data) => {
+      // Replace the temp optimistic message with the real DB-persisted message
+      if (data?.userMessage) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m._id?.startsWith("temp-") ? data.userMessage : m
+          )
+        );
+      }
+    };
+
     const handleChunk = (data) => {
       setIsStreaming(true);
       setStreamingContent((prev) => prev + (data.chunk || data.text || ""));
@@ -110,17 +236,21 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     const handleComplete = (data) => {
       setIsStreaming(false);
       setStreamingContent("");
-      if (data && data.message) {
-        setMessages((prev) => [...prev, data.message]);
+      // Server emits { assistantMessage } — add it to the list
+      const aiMsg = data?.assistantMessage || data?.message;
+      if (aiMsg) {
+        setMessages((prev) => [...prev, aiMsg]);
       }
       scrollToBottom();
       onTriggerRefresh?.();
     };
 
+    socket.on("user_message_saved", handleUserMsgSaved);
     socket.on("message_chunk", handleChunk);
     socket.on("message_complete", handleComplete);
 
     return () => {
+      socket.off("user_message_saved", handleUserMsgSaved);
       socket.off("message_chunk", handleChunk);
       socket.off("message_complete", handleComplete);
     };
@@ -235,7 +365,6 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
         setActiveConvId(convId);
         onTriggerRefresh?.();
 
-        // Join socket room for the new conversation
         if (socket) {
           socket.emit("join_conversation", { conversationId: convId });
         }
@@ -252,6 +381,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       textareaRef.current.style.height = "auto";
     }
 
+    // Show the user's message instantly (optimistic UI)
     const tempUserMsg = {
       _id: `temp-${Date.now()}`,
       role: "user",
@@ -261,30 +391,38 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     };
     setMessages((prev) => [...prev, tempUserMsg]);
 
+    // Use socket streaming if connected — AI chunks arrive in real-time
+    if (socket && socket.connected) {
+      socket.emit("send_message", {
+        conversationId: convId,
+        content: textToSend,
+        attachmentIds,
+        model: selectedModel,
+        webSearch: isWebSearchEnabled,
+      });
+      // socket events (user_message_saved, message_chunk, message_complete) handle the rest
+      return;
+    }
+
+    // Fallback: HTTP request if socket not available
     try {
       setLoading(true);
       const res = await messageApi.send(convId, {
         content: textToSend,
         attachmentIds,
         model: selectedModel,
+        webSearch: isWebSearchEnabled,
       });
       if (res && res.data) {
-        // Backend returns { userMessage, assistantMessage }
         const aiReply = res.data.assistantMessage || res.data.aiMessage || res.data.reply;
-        if (aiReply && aiReply.content) {
-          // Replace temp user msg with actual user msg, then add AI reply
-          setMessages((prev) => {
-            const withoutTemp = prev.filter(m => m._id !== tempUserMsg._id);
-            const msgs = [...withoutTemp];
-            if (res.data.userMessage) {
-              msgs.push(res.data.userMessage);
-            } else {
-              msgs.push(tempUserMsg);
-            }
-            msgs.push(aiReply);
-            return msgs;
-          });
-        }
+        setMessages((prev) => {
+          const withoutTemp = prev.filter((m) => m._id !== tempUserMsg._id);
+          const msgs = [...withoutTemp];
+          if (res.data.userMessage) msgs.push(res.data.userMessage);
+          else msgs.push(tempUserMsg);
+          if (aiReply) msgs.push(aiReply);
+          return msgs;
+        });
       }
     } catch (err) {
       console.error("Failed to send message:", err);
@@ -412,7 +550,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
 
                 <div className="msg-body-wrapper">
                   <div className="msg-bubble">
-                    <div style={{ whiteSpace: "pre-wrap" }}>{msg.content}</div>
+                    {renderBubbleContent(msg.content)}
                   </div>
 
                   <div className="msg-meta">

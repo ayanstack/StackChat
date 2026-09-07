@@ -9,7 +9,8 @@ export const sendMessage = asyncHandler(async (req, res) => {
     req.params.conversationId,
     req.body.content,
     req.body.attachmentIds,
-    req.body.model
+    req.body.model,
+    { webSearch: req.body.webSearch }
   );
   new ApiResponse(
     HTTP_STATUS.CREATED,
