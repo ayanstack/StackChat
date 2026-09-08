@@ -337,7 +337,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     if (!file) return;
 
     try {
-      setLoading(true);
+      setInitialLoading(true);
       const formData = new FormData();
       formData.append("file", file);
       
@@ -349,7 +349,7 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       console.error("File upload failed:", err);
       alert("Failed to upload file");
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
@@ -476,6 +476,10 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
   };
 
   const handleDeleteMessage = async (msgId) => {
+    if (!msgId || typeof msgId !== "string" || msgId.startsWith("temp-")) {
+      setMessages((prev) => prev.filter((m) => m._id !== msgId));
+      return;
+    }
     try {
       await messageApi.delete(msgId);
       setMessages((prev) => prev.filter((m) => m._id !== msgId));
