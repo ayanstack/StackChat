@@ -6,7 +6,7 @@ export const createMemorySchema = z.object({
   body: z.object({
     key: z.string().min(1, "Key is required").max(100, "Key is too long"),
     value: z.string().min(1, "Value is required").max(2000, "Value is too long"),
-    category: z.enum(["preference", "fact", "instruction", "profile", "other"]).optional(),
+    category: z.string().optional().default("fact"),
     enabled: z.boolean().optional(),
   }),
 });
@@ -18,7 +18,7 @@ export const updateMemorySchema = z.object({
   body: z.object({
     key: z.string().min(1).max(100).optional(),
     value: z.string().min(1).max(2000).optional(),
-    category: z.enum(["preference", "fact", "instruction", "profile", "other"]).optional(),
+    category: z.string().optional(),
     enabled: z.boolean().optional(),
   }),
 });
