@@ -53,8 +53,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const clientDist = path.resolve(__dirname, "../../client/dist");
 
-// Serve static files with correct MIME types (express.static handles this)
-app.use(express.static(clientDist, { maxAge: "1y", immutable: true }));
+// Serve static files with correct MIME types and no-cache for index.html
+app.use(
+  express.static(clientDist, {
+    setHeaders: (res, filePath) => {
+      if (filePath.endsWith("index.html")) {
+        res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+        res.setHeader("Pragma", "no-cache");
+        res.setHeader("Expires", "0");
+      } else {
+        res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+      }
+    },
+  })
+);
 
 // Guard: if a request to /assets/* was NOT served by express.static
 // (file missing), return a plain 404 instead of falling through
@@ -131,6 +143,9 @@ app.get("*", (req, res, next) => {
   }
   const indexPath = path.join(clientDist, "index.html");
   if (existsSync(indexPath)) {
+    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
     return res.sendFile(indexPath);
   }
   // index.html doesn't exist yet (build hasn't run)
