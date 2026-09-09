@@ -270,18 +270,27 @@ export default function AuthModal({ onClose, initialMode = "login", initialToken
 
           {mode !== "reset" && (
             <div className="input-group" style={{ marginBottom: 0 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
-                <Mail size={13} color="var(--accent-primary)" />
-                <label className="input-label" style={{ marginBottom: 0 }}>Email Address</label>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 5 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Mail size={13} color="var(--accent-primary)" />
+                  <label className="input-label" style={{ marginBottom: 0 }}>Original Email Address</label>
+                </div>
+                <span style={{ fontSize: "0.7rem", color: "var(--accent-emerald)", fontWeight: 500 }}>
+                  Genuine Mail Only
+                </span>
               </div>
               <input
                 type="email"
                 className="input-field"
-                placeholder="you@company.com"
+                placeholder="yourname@gmail.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
               />
+              <div style={{ fontSize: "0.72rem", color: "var(--text-muted)", marginTop: 4, display: "flex", alignItems: "center", gap: 5 }}>
+                <ShieldCheck size={11} color="var(--accent-emerald)" />
+                <span>Use your original email (Gmail, Outlook, Yahoo). Temporary/farzi emails are blocked.</span>
+              </div>
             </div>
           )}
 
