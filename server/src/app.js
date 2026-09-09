@@ -83,7 +83,9 @@ app.use(morgan("dev", { stream: logger.stream }));
 // ──────────────────────────────────────────────────────────
 // 3. HEALTH CHECK
 // ──────────────────────────────────────────────────────────
-app.get("/health", (req, res) => {
+const API_BASE = `/api/${env.API_VERSION}`;
+
+app.get(["/health", `${API_BASE}/health`], (req, res) => {
   new ApiResponse(
     200,
     {
@@ -97,7 +99,6 @@ app.get("/health", (req, res) => {
 // ──────────────────────────────────────────────────────────
 // 4. API ROUTES
 // ──────────────────────────────────────────────────────────
-const API_BASE = `/api/${env.API_VERSION}`;
 
 app.use(`${API_BASE}/auth`, authRoutes);
 app.use(`${API_BASE}/users`, userRoutes);
