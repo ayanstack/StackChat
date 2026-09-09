@@ -8,7 +8,7 @@ import {
   Copy,
   Check,
   Bot,
-  User as UserIcon,
+  User,
   Globe,
   Mic,
   Compass,
