@@ -76,14 +76,22 @@ export default function Sidebar({
         const convList = res.data.conversations || res.data || [];
         setConversations(convList);
 
-        if (!activeConvId && convList.length > 0) {
-          const savedId = sessionStorage.getItem("stackchat_active_conv");
-          const found = convList.find((c) => c._id === savedId);
+        const currentId = activeConvId || sessionStorage.getItem("stackchat_active_conv");
+        if (convList.length > 0) {
+          const found = currentId ? convList.find((c) => c._id === currentId) : null;
           if (found) {
-            setActiveConvId(found._id);
-          } else {
+            // Current ID is valid — keep it, just sync if needed
+            if (activeConvId !== found._id) setActiveConvId(found._id);
+          } else if (!currentId) {
+            // No active conv at all — auto-select first
             setActiveConvId(convList[0]._id);
+          } else {
+            // currentId was set but not found in list (deleted/stale)
+            // Clear the stale ID so ChatView shows empty state
+            setActiveConvId(null);
           }
+        } else {
+          if (activeConvId) setActiveConvId(null);
         }
       }
     } catch (err) {
@@ -103,7 +111,12 @@ export default function Sidebar({
     }
     try {
       const res = await conversationApi.create({ title: "New Conversation" });
-      const newConv = res.data;
+      // API returns { data: { conversation: {...} } }
+      const newConv = res.data?.conversation || res.data;
+      if (!newConv?._id) {
+        console.error("Failed to get conversation from response:", res);
+        return;
+      }
       setConversations((prev) => [newConv, ...prev]);
       setActiveConvId(newConv._id);
       setActiveView("chat");

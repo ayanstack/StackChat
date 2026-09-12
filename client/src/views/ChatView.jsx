@@ -188,9 +188,13 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
+  // Fetch messages when conversation changes
   useEffect(() => {
     if (!activeConvId) {
       setMessages([]);
+      setIsThinking(false);
+      setIsStreaming(false);
+      setStreamingContent("");
       return;
     }
 
@@ -203,16 +207,21 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
         }
       } catch (err) {
         console.error("Failed to load messages:", err);
+        // Do NOT set activeConvId(null) here — it would cause an infinite loop.
+        // The Sidebar's fetchConversations will handle cleanup of stale IDs.
+        setMessages([]);
       } finally {
         setInitialLoading(false);
       }
     };
 
     fetchMessages();
+  }, [activeConvId]);
 
-    if (socket && activeConvId) {
-      socket.emit("join_conversation", { conversationId: activeConvId });
-    }
+  // Join socket room when conversation or socket changes
+  useEffect(() => {
+    if (!socket || !activeConvId) return;
+    socket.emit("join_conversation", { conversationId: activeConvId });
   }, [activeConvId, socket]);
 
   useEffect(() => {
@@ -254,18 +263,32 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       setIsStreaming(false);
       setStreamingContent("");
       console.error("Socket error during generation:", data);
+
+      const errText = data?.message || "An error occurred while processing your request.";
+      // NOTE: Do NOT call setActiveConvId(null) here — it causes a fetch→error→null loop.
+      // Only show the error inline so user can retry.
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: `error-${Date.now()}`,
+          role: "assistant",
+          content: `⚠️ **Error:** ${errText}\n\nPlease try again.`,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
     };
 
     socket.on("user_message_saved", handleUserMsgSaved);
     socket.on("message_chunk", handleChunk);
     socket.on("message_complete", handleComplete);
-    socket.on("error", handleError);
+    socket.on("generation_error", handleError);
 
     return () => {
       socket.off("user_message_saved", handleUserMsgSaved);
       socket.off("message_chunk", handleChunk);
       socket.off("message_complete", handleComplete);
-      socket.off("error", handleError);
+      socket.off("generation_error", handleError);
     };
   }, [socket, onTriggerRefresh]);
 
@@ -403,13 +426,13 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       createdAt: new Date().toISOString(),
     };
     setMessages((prev) => [...prev, tempUserMsg]);
-    setIsThinking(true);
-    setIsStreaming(true);
     setStreamingContent("");
     scrollToBottom();
 
     // Use socket streaming if connected — AI chunks arrive in real-time
     if (socket && socket.connected) {
+      setIsThinking(true);
+      setIsStreaming(false); // Will become true once first chunk arrives
       socket.emit("send_message", {
         conversationId: convId,
         content: textToSend,
@@ -421,10 +444,12 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       return;
     }
 
+    // HTTP fallback — set streaming state here
+    setIsThinking(true);
+    setIsStreaming(true);
+
     // Fallback: HTTP request if socket not available
     try {
-      setIsThinking(true);
-      setIsStreaming(true);
       const res = await messageApi.send(convId, {
         content: textToSend,
         attachmentIds,
@@ -444,6 +469,16 @@ export default function ChatView({ activeConvId, setActiveConvId, onTriggerRefre
       }
     } catch (err) {
       console.error("Failed to send message:", err);
+      // Do NOT set activeConvId(null) — causes fetch loop
+      setMessages((prev) => [
+        ...prev,
+        {
+          _id: `error-${Date.now()}`,
+          role: "assistant",
+          content: `⚠️ **Failed to send message:** ${err.message || "Unknown error"}. Please try again.`,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
     } finally {
       setIsThinking(false);
       setIsStreaming(false);

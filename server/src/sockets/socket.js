@@ -175,7 +175,7 @@ export function initializeSocket(server) {
               message: "conversationId is required",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -190,7 +190,7 @@ export function initializeSocket(server) {
               message: "Invalid conversationId",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -212,7 +212,7 @@ export function initializeSocket(server) {
                 "Conversation not found or access denied",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -258,7 +258,7 @@ export function initializeSocket(server) {
               "Failed to join conversation",
           };
 
-          socket.emit("error", response);
+          socket.emit("generation_error", response);
 
           if (typeof ack === "function") {
             ack(response);
@@ -284,7 +284,7 @@ export function initializeSocket(server) {
               message: "conversationId is required",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -327,7 +327,7 @@ export function initializeSocket(server) {
             message: "Failed to leave conversation",
           };
 
-          socket.emit("error", response);
+          socket.emit("generation_error", response);
 
           if (typeof ack === "function") {
             ack(response);
@@ -435,7 +435,7 @@ export function initializeSocket(server) {
                 "Message payload is required",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -474,7 +474,7 @@ export function initializeSocket(server) {
                 "conversationId is required",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -493,7 +493,7 @@ export function initializeSocket(server) {
               message: "content is required",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -512,7 +512,7 @@ export function initializeSocket(server) {
               message: "Invalid conversationId",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -538,7 +538,7 @@ export function initializeSocket(server) {
                 "Conversation not found or access denied",
             };
 
-            socket.emit("error", response);
+            socket.emit("generation_error", response);
 
             if (typeof ack === "function") {
               ack(response);
@@ -640,7 +640,7 @@ export function initializeSocket(server) {
           };
 
           socket.emit(
-            "error",
+            "generation_error",
             errorResponse
           );
 
